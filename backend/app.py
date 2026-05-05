@@ -32,12 +32,29 @@ def get_recommendations(user_id):
     profile = profiles.get(user_id, {"goal": "weight_loss"})
     
     plan = {
+        "goal": profile.get("goal", "weight_loss"),
         "level": "Beginner",
-        "routine": ["Push-ups", "Squats", "Plank"],
-        "duration": "20 mins",
-        "notes": "Based on your activity."
+        "estimatedCalories": 300,
+        "workoutMinutes": 20,
+        "exercises": [
+            {"id": "ex1", "name": "Push-ups", "sets": 3, "reps": "10-15", "notes": "Keep back straight"},
+            {"id": "ex2", "name": "Squats", "sets": 3, "reps": "15-20", "notes": "Go low"},
+            {"id": "ex3", "name": "Plank", "sets": 3, "reps": "60s", "notes": "Hold steady"}
+        ]
     }
-    meals = ["Oatmeal", "Grilled Chicken Salad", "Protein Shake"]
+    meals = {
+        "rules": [
+            "Eat protein with every meal",
+            "Drink 2L of water",
+            "Avoid processed sugar"
+        ],
+        "meals": [
+            {"name": "Breakfast", "details": "Oatmeal with berries"},
+            {"name": "Lunch", "details": "Grilled Chicken Salad"},
+            {"name": "Dinner", "details": "Salmon with asparagus"},
+            {"name": "Snack", "details": "Protein Shake"}
+        ]
+    }
     return jsonify({"ok": True, "plan": plan, "meals": meals})
 
 @app.route('/api/workout/log', methods=['POST'])
