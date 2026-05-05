@@ -89,5 +89,10 @@ def analyze_pose():
 def pose_status():
     return jsonify({"ok": True, "pose_enabled": True})
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return jsonify({"error": f"API endpoint not found: /{path}", "ok": False}), 404
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

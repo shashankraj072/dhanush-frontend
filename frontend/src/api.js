@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000'
+// When running locally, Vite's import.meta.env.DEV is true, so it uses localhost.
+// On Vercel, it uses the same domain, so API_BASE is empty (making it relative).
+const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? 'http://localhost:5000' : '')
 
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
