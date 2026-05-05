@@ -70,7 +70,7 @@ export default function Workout() {
       try {
         const res = await getPoseStatus()
         if (cancelled) return
-        setPoseAvailable(Boolean(res.available))
+        setPoseAvailable(Boolean(res.available || res.pose_enabled))
         setPoseMessage(res.message || '')
       } catch (e) {
         if (cancelled) return

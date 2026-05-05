@@ -47,7 +47,7 @@ export default function Plan() {
         <div className="cardHeader">
           <h1 className="heroTitle">Your plan</h1>
           <p className="muted">
-            Adapted using your completion history (MVP logic).
+            Adapted using your completion history .
           </p>
         </div>
         {loading ? <p>Loading…</p> : null}
