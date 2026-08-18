@@ -108,19 +108,63 @@ def get_recommendations(user_id):
             {"id": "ex3", "name": "Plank", "sets": 3, "reps": "90s" if predicted_level == 'Advanced' else "60s", "notes": "Hold steady"}
         ]
     }
-    meals = {
-        "rules": [
-            "Eat protein with every meal",
-            "Drink 2L of water",
-            "Avoid processed sugar"
-        ],
-        "meals": [
-            {"name": "Breakfast", "details": "Oatmeal with berries"},
-            {"name": "Lunch", "details": "Grilled Chicken Salad"},
-            {"name": "Dinner", "details": "Salmon with asparagus"},
-            {"name": "Snack", "details": "Protein Shake"}
-        ]
-    }
+    if goal == "muscle_gain":
+        meals = {
+            "rules": [
+                "Eat 1.6g to 2.2g of protein per kg of body weight",
+                "Maintain a slight caloric surplus",
+                "Drink at least 3L of water daily"
+            ],
+            "meals": [
+                {"name": "Breakfast", "details": "4 Scrambled eggs with spinach and whole wheat toast"},
+                {"name": "Lunch", "details": "Chicken breast (200g) with quinoa and broccoli"},
+                {"name": "Dinner", "details": "Steak or tofu with sweet potato and asparagus"},
+                {"name": "Snack", "details": "Whey protein shake and a banana"}
+            ]
+        }
+    elif goal == "weight_loss":
+        meals = {
+            "rules": [
+                "Maintain a caloric deficit (300-500 kcal)",
+                "Focus on high-volume, low-calorie foods",
+                "Drink a glass of water before every meal"
+            ],
+            "meals": [
+                {"name": "Breakfast", "details": "Oatmeal with berries and a scoop of protein powder"},
+                {"name": "Lunch", "details": "Large mixed greens salad with grilled chicken or chickpeas"},
+                {"name": "Dinner", "details": "Baked salmon with steamed vegetables"},
+                {"name": "Snack", "details": "Greek yogurt or carrot sticks with hummus"}
+            ]
+        }
+    elif goal == "endurance":
+        meals = {
+            "rules": [
+                "Focus on complex carbohydrates for sustained energy",
+                "Stay hydrated before, during, and after workouts",
+                "Replenish electrolytes"
+            ],
+            "meals": [
+                {"name": "Breakfast", "details": "Whole grain pancakes with maple syrup and fruit"},
+                {"name": "Lunch", "details": "Turkey wrap with veggies and a side of pasta salad"},
+                {"name": "Dinner", "details": "Lean pork or tempeh with brown rice and bell peppers"},
+                {"name": "Snack", "details": "Handful of almonds and an apple"}
+            ]
+        }
+    else:
+        meals = {
+            "rules": [
+                "Eat a balanced diet rich in vitamins and minerals",
+                "Incorporate anti-inflammatory foods (omega-3s)",
+                "Drink 2L of water daily"
+            ],
+            "meals": [
+                {"name": "Breakfast", "details": "Smoothie bowl with spinach, banana, and chia seeds"},
+                {"name": "Lunch", "details": "Lentil soup with a side of whole grain bread"},
+                {"name": "Dinner", "details": "Grilled fish or tofu with mixed roasted veggies"},
+                {"name": "Snack", "details": "Fresh fruit and mixed nuts"}
+            ]
+        }
+        
     return jsonify({"ok": True, "plan": plan, "meals": meals})
 
 @app.route('/api/workout/log', methods=['POST'])
