@@ -2,6 +2,23 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import uuid
 import random
+import os
+import pickle
+import pandas as pd
+
+# Load ML Models
+MODEL_DIR = os.path.join(os.path.dirname(__file__), 'ml_models')
+rf_model, le_goal, le_level = None, None, None
+
+try:
+    with open(os.path.join(MODEL_DIR, 'rf_model.pkl'), 'rb') as f:
+        rf_model = pickle.load(f)
+    with open(os.path.join(MODEL_DIR, 'le_goal.pkl'), 'rb') as f:
+        le_goal = pickle.load(f)
+    with open(os.path.join(MODEL_DIR, 'le_level.pkl'), 'rb') as f:
+        le_level = pickle.load(f)
+except Exception as e:
+    print(f"Warning: Could not load ML models: {e}")
 
 app = Flask(__name__)
 CORS(app)
@@ -29,17 +46,37 @@ def save_profile():
 
 @app.route('/api/recommendations/<user_id>', methods=['GET'])
 def get_recommendations(user_id):
-    profile = profiles.get(user_id, {"goal": "weight_loss"})
+    profile = profiles.get(user_id, {})
+    goal = profile.get("goal", "weight_loss")
+    
+    predicted_level = "Beginner"
+    try:
+        # Simple defaults if profile is incomplete
+        age = float(profile.get("age", 30))
+        weight = float(profile.get("weight", 70))
+        height = float(profile.get("height", 170))
+        bmi = weight / ((height/100)**2)
+        
+        if rf_model and le_goal and le_level:
+            # Prepare input data for ML model
+            goal_encoded = le_goal.transform([goal])[0]
+            input_df = pd.DataFrame([[age, weight, height, bmi, goal_encoded]], 
+                                    columns=['Age', 'Weight', 'Height', 'BMI', 'Goal'])
+            pred_encoded = rf_model.predict(input_df)[0]
+            predicted_level = le_level.inverse_transform([pred_encoded])[0]
+    except Exception as e:
+        print(f"ML Prediction Error: {e}")
+        pass # fallback to Beginner
     
     plan = {
-        "goal": profile.get("goal", "weight_loss"),
-        "level": "Beginner",
-        "estimatedCalories": 300,
-        "workoutMinutes": 20,
+        "goal": goal,
+        "level": predicted_level,
+        "estimatedCalories": 400 if predicted_level == 'Advanced' else (350 if predicted_level == 'Intermediate' else 300),
+        "workoutMinutes": 45 if predicted_level == 'Advanced' else (30 if predicted_level == 'Intermediate' else 20),
         "exercises": [
-            {"id": "ex1", "name": "Push-ups", "sets": 3, "reps": "10-15", "notes": "Keep back straight"},
-            {"id": "ex2", "name": "Squats", "sets": 3, "reps": "15-20", "notes": "Go low"},
-            {"id": "ex3", "name": "Plank", "sets": 3, "reps": "60s", "notes": "Hold steady"}
+            {"id": "ex1", "name": "Push-ups", "sets": 4 if predicted_level == 'Advanced' else 3, "reps": "15-20" if predicted_level == 'Advanced' else "10-15", "notes": "Keep back straight"},
+            {"id": "ex2", "name": "Squats", "sets": 4 if predicted_level == 'Advanced' else 3, "reps": "20-25" if predicted_level == 'Advanced' else "15-20", "notes": "Go low"},
+            {"id": "ex3", "name": "Plank", "sets": 3, "reps": "90s" if predicted_level == 'Advanced' else "60s", "notes": "Hold steady"}
         ]
     }
     meals = {
