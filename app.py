@@ -125,21 +125,7 @@ def get_progress(user_id):
     }
     return jsonify({"ok": True, "progress": progress})
 
-@app.route('/api/pose/analyze', methods=['POST'])
-def analyze_pose():
-    # Mock pose analysis
-    return jsonify({
-        "ok": True,
-        "results": {
-            "posture_accuracy": f"{random.randint(80, 100)}%",
-            "feedback": "Keep your back straight.",
-            "rep_counted": True
-        }
-    })
 
-@app.route('/api/pose/status', methods=['GET'])
-def pose_status():
-    return jsonify({"ok": True, "pose_enabled": True})
 
 
 

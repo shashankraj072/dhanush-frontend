@@ -1,21 +1,26 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { analyzePose, getPoseStatus, getRecommendations, logWorkout } from '../api'
+import { useEffect, useRef, useState, useMemo } from 'react'
+import { getRecommendations, logWorkout } from '../api'
 import { loadUser } from '../state'
+import { Pose, POSE_CONNECTIONS } from '@mediapipe/pose'
+import { Camera } from '@mediapipe/camera_utils'
+import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
 
 const EXERCISES = [
   { id: 'squat', label: 'Squats' },
-  { id: 'sumo_squat', label: 'Sumo squats' },
   { id: 'pushup', label: 'Push-ups' },
   { id: 'lunge', label: 'Lunges' },
   { id: 'plank', label: 'Plank' },
   { id: 'bicep_curl', label: 'Bicep curl' },
-  { id: 'hammer_curl', label: 'Hammer curl' },
-  { id: 'pullup', label: 'Pull-ups' },
-  { id: 'bench_press', label: 'Bench press' },
-  { id: 'shoulder_press', label: 'Shoulder press' },
-  { id: 'lateral_raise', label: 'Lateral raise' },
-  { id: 'tricep_extension', label: 'Tricep extension' },
 ]
+
+function calculateAngle(a, b, c) {
+  const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x)
+  let angle = Math.abs((radians * 180.0) / Math.PI)
+  if (angle > 180.0) {
+    angle = 360 - angle
+  }
+  return angle
+}
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x))
@@ -25,27 +30,26 @@ export default function Workout() {
   const user = loadUser()
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
+  
   const [exerciseId, setExerciseId] = useState('squat')
   const [running, setRunning] = useState(false)
   const [alerts, setAlerts] = useState([])
   const [accuracy, setAccuracy] = useState(0)
-  const [debug, setDebug] = useState(null)
   const [err, setErr] = useState('')
   const [plan, setPlan] = useState(null)
   const [samples, setSamples] = useState([])
   const [durationMin, setDurationMin] = useState(5)
   const [saving, setSaving] = useState(false)
-  const [poseAvailable, setPoseAvailable] = useState(true)
-  const [poseMessage, setPoseMessage] = useState('')
+  
   const [repState, setRepState] = useState({ count: 0, stage: 'up' })
   const repStateRef = useRef({ count: 0, stage: 'up' })
-  const inFlightRef = useRef(false)
 
   const avgAccuracy = useMemo(() => {
     if (!samples.length) return 0
     return samples.reduce((a, b) => a + b, 0) / samples.length
   }, [samples])
-  const accuracyPct = Math.round(avgAccuracy * 100)
+  
+  const accuracyPct = Math.round(avgAccuracy * 100) || 0
 
   useEffect(() => {
     let cancelled = false
@@ -55,113 +59,158 @@ export default function Workout() {
         const res = await getRecommendations(user.userId)
         if (!cancelled) setPlan(res.plan)
       } catch {
-        // ignore; workout can still run
+        // ignore
       }
     }
     loadPlan()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [user?.userId])
 
   useEffect(() => {
-    let cancelled = false
-    async function checkPose() {
-      try {
-        const res = await getPoseStatus()
-        if (cancelled) return
-        setPoseAvailable(Boolean(res.available || res.pose_enabled))
-        setPoseMessage(res.message || '')
-      } catch (e) {
-        if (cancelled) return
-        setPoseAvailable(false)
-        setPoseMessage(e.message || 'Could not verify pose service')
-      }
-    }
-    checkPose()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    let camera = null
+    let pose = null
 
-  useEffect(() => {
-    let stream
-    async function startCam() {
+    async function startMediaPipe() {
       if (!running) return
       setErr('')
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 960, height: 540 },
-          audio: false,
-        })
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          await videoRef.current.play()
+      
+      const videoElement = videoRef.current
+      const canvasElement = canvasRef.current
+      if (!videoElement || !canvasElement) return
+      
+      const canvasCtx = canvasElement.getContext('2d')
+
+      pose = new Pose({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
         }
+      })
+
+      pose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        smoothSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      })
+
+      pose.onResults((results) => {
+        canvasCtx.save()
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height)
+        
+        // Draw video frame on canvas
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height)
+
+        if (results.poseLandmarks) {
+          drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 })
+          drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 })
+
+          // Rep counting logic
+          let feedback = []
+          let currAccuracy = 1.0
+          const landmarks = results.poseLandmarks
+          
+          if (exerciseId === 'squat') {
+            const hip = landmarks[23] // Left hip
+            const knee = landmarks[25] // Left knee
+            const ankle = landmarks[27] // Left ankle
+            
+            if (hip && knee && ankle && hip.visibility > 0.5) {
+              const angle = calculateAngle(hip, knee, ankle)
+              let stage = repStateRef.current.stage
+              let count = repStateRef.current.count
+              
+              if (angle > 160) {
+                stage = 'up'
+              }
+              if (angle < 90 && stage === 'up') {
+                stage = 'down'
+                count += 1
+                feedback.push("Good depth!")
+              }
+              if (angle < 60) {
+                feedback.push("Going too low, protect your knees!")
+                currAccuracy = 0.8
+              }
+              if (stage === 'down' && angle > 100 && angle < 150) {
+                feedback.push("Push all the way up!")
+              }
+              
+              repStateRef.current = { count, stage }
+              setRepState({ count, stage })
+            } else {
+               feedback.push("Please stand further back. Full legs must be visible.")
+               currAccuracy = 0.5
+            }
+          } else if (exerciseId === 'bicep_curl') {
+            const shoulder = landmarks[11] // Left shoulder
+            const elbow = landmarks[13] // Left elbow
+            const wrist = landmarks[15] // Left wrist
+            
+            if (shoulder && elbow && wrist && shoulder.visibility > 0.5) {
+              const angle = calculateAngle(shoulder, elbow, wrist)
+              let stage = repStateRef.current.stage
+              let count = repStateRef.current.count
+              
+              if (angle > 160) {
+                stage = 'down'
+              }
+              if (angle < 45 && stage === 'down') {
+                stage = 'up'
+                count += 1
+              }
+              
+              repStateRef.current = { count, stage }
+              setRepState({ count, stage })
+            } else {
+               feedback.push("Left arm not visible.")
+               currAccuracy = 0.5
+            }
+          } else {
+            feedback.push("Rep counting not available for this exercise yet.")
+            currAccuracy = 0.9
+          }
+          
+          setAlerts(feedback)
+          setAccuracy(currAccuracy)
+          setSamples((s) => [...s.slice(-39), currAccuracy])
+        } else {
+          setAlerts(["No person detected"])
+          setAccuracy(0)
+        }
+        canvasCtx.restore()
+      })
+
+      camera = new Camera(videoElement, {
+        onFrame: async () => {
+          if (videoElement.readyState >= 2) {
+            await pose.send({ image: videoElement })
+          }
+        },
+        width: 640,
+        height: 480
+      })
+      
+      try {
+        await camera.start()
       } catch (e) {
-        setErr(e.message || 'Failed to start camera')
-        setRunning(false)
+        setErr('Camera failed to start: ' + e.message)
       }
     }
-    startCam()
+
+    startMediaPipe()
+
     return () => {
-      if (stream) stream.getTracks().forEach((t) => t.stop())
-    }
-  }, [running])
-
-  useEffect(() => {
-    let timer = null
-    async function tick() {
-      if (inFlightRef.current) return
-      const video = videoRef.current
-      const canvas = canvasRef.current
-      if (!video || !canvas) return
-      if (video.readyState < 2) return
-
-      inFlightRef.current = true
-      canvas.width = video.videoWidth || 960
-      canvas.height = video.videoHeight || 540
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.7)
-      try {
-        const res = await analyzePose({
-          imageBase64: dataUrl,
-          exercise: exerciseId,
-          repState: repStateRef.current,
-        })
-        setAlerts(res.alerts || [])
-        setAccuracy(clamp01(Number(res.postureAccuracy || 0)))
-        setSamples((s) => [...s.slice(-39), clamp01(Number(res.postureAccuracy || 0))])
-        setDebug(res.debug || null)
-        if (res.repState) {
-          repStateRef.current = res.repState
-          setRepState(res.repState)
-        }
-      } catch (e) {
-        setErr(e.message || 'Pose analysis failed')
-      } finally {
-        inFlightRef.current = false
-      }
-    }
-
-    if (running) {
-      timer = setInterval(tick, 700) // keep it low-frequency for MVP
-    }
-    return () => {
-      if (timer) clearInterval(timer)
+      if (camera) camera.stop()
+      if (pose) pose.close()
     }
   }, [running, exerciseId])
 
   useEffect(() => {
-    // Reset counter on exercise switch
     setRepState({ count: 0, stage: 'up' })
+    repStateRef.current = { count: 0, stage: 'up' }
   }, [exerciseId])
-
-  useEffect(() => {
-    repStateRef.current = repState
-  }, [repState])
 
   if (!user?.userId) {
     return (
@@ -197,16 +246,16 @@ export default function Workout() {
     <section className="stack">
       <div className="card pageEnter">
         <div className="cardHeader">
-          <h1 className="heroTitle">Workout + posture feedback</h1>
+          <h1 className="heroTitle">Workout + AI Pose Tracker</h1>
           <p className="muted">
-            Webcam frames are analyzed by the Flask backend using MediaPipe BlazePose.
+            Powered by MediaPipe directly in your browser. Fast, private, and zero latency!
           </p>
         </div>
         <div className="workoutHero">
           <div className="counterOrb">
             <div className="counterLabel">Reps</div>
-            <div className="counterValue">{repState?.count || 0}</div>
-            <div className="counterSub">Stage: {repState?.stage || 'up'}</div>
+            <div className="counterValue">{repState.count}</div>
+            <div className="counterSub">Stage: {repState.stage}</div>
           </div>
           <div className="counterOrb">
             <div className="counterLabel">Posture</div>
@@ -222,9 +271,7 @@ export default function Workout() {
                 <span className="label">Exercise</span>
                 <select value={exerciseId} onChange={(e) => setExerciseId(e.target.value)}>
                   {EXERCISES.map((ex) => (
-                    <option key={ex.id} value={ex.id}>
-                      {ex.label}
-                    </option>
+                    <option key={ex.id} value={ex.id}>{ex.label}</option>
                   ))}
                 </select>
               </label>
@@ -240,91 +287,68 @@ export default function Workout() {
               </label>
               <button
                 className="primaryBtn"
-                disabled={!poseAvailable}
                 onClick={() => setRunning((r) => !r)}
               >
-                {running ? 'Stop camera' : 'Start camera'}
+                {running ? 'Stop camera' : 'Start AI Tracking'}
               </button>
             </div>
 
-            {!poseAvailable ? (
-              <div className="error">
-                Pose engine unavailable: {poseMessage}
-              </div>
-            ) : null}
-
-            <div className="videoWrap">
-              <video ref={videoRef} playsInline muted className="video" />
-              <canvas ref={canvasRef} className="canvasHidden" />
+            <div className="videoWrap" style={{ position: 'relative', width: '100%', maxWidth: '640px', height: '480px', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden' }}>
+              {/* Hide the raw video, only show the canvas overlay */}
+              <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
+              <canvas ref={canvasRef} width="640" height="480" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              
+              {!running && (
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                  Click "Start AI Tracking" to begin
+                </div>
+              )}
             </div>
 
-            {err ? <div className="error">{err}</div> : null}
-            <div className="pillRow">
-              <span className="pill">
-                Live accuracy: {(accuracy * 100).toFixed(0)}%
-              </span>
-              <span className="pill">
-                Avg (last {samples.length}): {(avgAccuracy * 100).toFixed(0)}%
-              </span>
-              <span className="pill repPill">Reps: {repState?.count || 0}</span>
-              <span className="pill">Stage: {repState?.stage || 'down'}</span>
-            </div>
+            {err ? <div className="error" style={{ marginTop: '1rem' }}>{err}</div> : null}
 
-            <div className="alerts">
+            <div className="alerts" style={{ marginTop: '1rem' }}>
               <h2>Feedback</h2>
               <ul className="list">
-                {(alerts || []).map((a, idx) => (
-                  <li key={idx} className="listItem">
-                    {a}
-                  </li>
+                {alerts.length === 0 ? <li className="listItem muted">No active feedback</li> : null}
+                {alerts.map((a, idx) => (
+                  <li key={idx} className="listItem" style={{ color: '#00FF00', fontWeight: 'bold' }}>{a}</li>
                 ))}
               </ul>
             </div>
 
-            <div className="row">
-              <button
-                className="primaryBtn"
-                disabled={saving}
-                onClick={() => saveLog(true)}
-              >
+            <div className="row" style={{ marginTop: '1rem' }}>
+              <button className="primaryBtn" disabled={saving} onClick={() => saveLog(true)}>
                 {saving ? 'Saving…' : 'Mark completed'}
               </button>
-              <button
-                className="ghostBtn"
-                disabled={saving}
-                onClick={() => saveLog(false)}
-              >
+              <button className="ghostBtn" disabled={saving} onClick={() => saveLog(false)}>
                 Log as not completed
               </button>
-              <button
-                type="button"
-                className="ghostBtn"
-                onClick={() => {
-                  const reset = { count: 0, stage: 'up' }
-                  repStateRef.current = reset
-                  setRepState(reset)
-                }}
-              >
+              <button type="button" className="ghostBtn" onClick={() => {
+                setRepState({ count: 0, stage: 'up' })
+                repStateRef.current = { count: 0, stage: 'up' }
+              }}>
                 Reset reps
               </button>
             </div>
           </div>
-
+          
           <div className="panel">
-            <h2>Debug</h2>
-            <p className="muted">
-              Angles are approximate and used only for MVP posture alerts.
-            </p>
-            <pre className="codeBlock">
-              {JSON.stringify({ exerciseId, debug }, null, 2)}
-            </pre>
-            <div className="muted">
-              Tip: ensure your full body is visible and the room is well lit.
-            </div>
+             <h2>Instructions</h2>
+             <ul style={{ paddingLeft: '1.5rem', marginTop: '1rem', lineHeight: '1.6' }}>
+                <li>Ensure your full body is visible in the camera frame.</li>
+                <li>Keep the room well-lit for accurate tracking.</li>
+                <li>Stand about 6 feet away from the camera.</li>
+             </ul>
+             
+             <h3 style={{ marginTop: '2rem' }}>How it works</h3>
+             <p className="muted" style={{ marginTop: '0.5rem', lineHeight: '1.6' }}>
+                This AI Pose Tracker runs 100% locally in your browser using Google MediaPipe. 
+                Your video is never sent to a server. We track 33 3D body landmarks to calculate joint angles and count repetitions automatically.
+             </p>
           </div>
         </div>
       </div>
     </section>
   )
 }
-

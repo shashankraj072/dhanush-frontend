@@ -41,12 +41,3 @@ export function logWorkout(payload) {
 export function getProgress(userId) {
   return apiFetch(`/api/progress/${encodeURIComponent(userId)}`)
 }
-
-export function analyzePose(payload) {
-  return apiFetch('/api/pose/analyze', { method: 'POST', body: JSON.stringify(payload) })
-}
-
-export function getPoseStatus() {
-  return apiFetch('/api/pose/status')
-}
-
