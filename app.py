@@ -50,6 +50,19 @@ workouts = []
 def health():
     return jsonify({"ok": True, "message": "Backend running"})
 
+@app.route('/api/debug', methods=['GET'])
+def debug():
+    import os
+    index_path = os.path.join(app.static_folder, 'index.html')
+    frontend_path = os.path.join(BASE_DIR, 'frontend')
+    return jsonify({
+        "static_folder": app.static_folder,
+        "index_exists": os.path.exists(index_path),
+        "root_contents": os.listdir(BASE_DIR),
+        "frontend_exists": os.path.exists(frontend_path),
+        "frontend_contents": os.listdir(frontend_path) if os.path.exists(frontend_path) else []
+    })
+
 @app.route('/api/profile', methods=['POST'])
 def save_profile():
     data = request.json
