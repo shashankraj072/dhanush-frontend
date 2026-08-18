@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { getRecommendations, logWorkout } from '../api'
 import { loadUser } from '../state'
-import { Pose, POSE_CONNECTIONS } from '@mediapipe/pose'
-import { Camera } from '@mediapipe/camera_utils'
-import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
+import * as mpPose from '@mediapipe/pose'
+import * as mpCam from '@mediapipe/camera_utils'
+import * as mpDraw from '@mediapipe/drawing_utils'
+
+const { Pose, POSE_CONNECTIONS } = mpPose
+const { Camera } = mpCam
+const { drawConnectors, drawLandmarks } = mpDraw
 
 const EXERCISES = [
   { id: 'squat', label: 'Squats' },

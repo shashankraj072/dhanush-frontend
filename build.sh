@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Build script for Render
 
 # 1. Activate Render's Python virtual environment
