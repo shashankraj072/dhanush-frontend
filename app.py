@@ -20,8 +20,11 @@ try:
 except Exception as e:
     print(f"Warning: Could not load ML models: {e}")
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.join(BASE_DIR, 'frontend', 'dist')
+
 # Configure Flask to serve React build folder
-app = Flask(__name__, static_folder='frontend/dist', static_url_path='/')
+app = Flask(__name__, static_folder=static_dir, static_url_path='/')
 CORS(app)
 
 @app.route('/', defaults={'path': ''})
@@ -41,9 +44,7 @@ def serve(path):
 profiles = {}
 workouts = []
 
-@app.route('/', methods=['GET'])
-def index():
-    return "Backend is running perfectly! Please open the frontend at http://localhost:5173"
+
 
 @app.route('/api/health', methods=['GET'])
 def health():
