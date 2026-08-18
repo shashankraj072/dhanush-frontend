@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import uuid
-import random
 import os
 import pickle
 import pandas as pd
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+import uuid
+import random
 
 # Load ML Models
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'ml_models')
@@ -20,8 +20,23 @@ try:
 except Exception as e:
     print(f"Warning: Could not load ML models: {e}")
 
-app = Flask(__name__)
+# Configure Flask to serve React build folder
+app = Flask(__name__, static_folder='frontend/dist', static_url_path='/')
 CORS(app)
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    # If the user is requesting an API route that doesn't exist, return 404 JSON
+    if path.startswith('api/'):
+        return jsonify({"error": f"API endpoint not found: /{path}", "ok": False}), 404
+    
+    # If the file exists in the React build folder (like .js or .css), serve it
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    
+    # Otherwise, return the React index.html (Client-side routing)
+    return send_from_directory(app.static_folder, 'index.html')
 
 profiles = {}
 workouts = []
@@ -126,10 +141,7 @@ def analyze_pose():
 def pose_status():
     return jsonify({"ok": True, "pose_enabled": True})
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    return jsonify({"error": f"API endpoint not found: /{path}", "ok": False}), 404
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
