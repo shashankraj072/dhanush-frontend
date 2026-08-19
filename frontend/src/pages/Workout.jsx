@@ -94,8 +94,7 @@ export default function Workout() {
 
   useEffect(() => {
     let pose = null
-    let stream = null
-    let animationFrameId = null
+    let camera = null
 
     async function startMediaPipe() {
       if (!running) {
@@ -251,52 +250,33 @@ export default function Workout() {
       })
 
       try {
-        setErr('Requesting camera...')
-        stream = await navigator.mediaDevices.getUserMedia({ video: true })
-        videoElement.srcObject = stream
-        setErr('Camera granted. Starting video...')
+        setErr('Starting MediaPipe Camera...')
+        // We use @mediapipe/camera_utils because it has robust internal workarounds for browser video frame extraction bugs!
+        const CameraClass = window.Camera || window.camera_utils?.Camera || (await import('@mediapipe/camera_utils')).Camera
         
-        // Force play unconditionally
-        videoElement.play().then(() => {
-          setErr('Video playing. Loading AI...')
-        }).catch(e => {
-          setErr('Video play error: ' + e.message)
-        })
-        
-        // Create offscreen canvas for bulletproof frame extraction
-        const offscreenCanvas = document.createElement('canvas')
-        const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true })
-
-        // Custom camera loop
-        async function processFrame() {
-          if (!running) return
-          if (videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
+        camera = new CameraClass(videoElement, {
+          onFrame: async () => {
+            if (!running) return
             try {
-              offscreenCanvas.width = videoElement.videoWidth;
-              offscreenCanvas.height = videoElement.videoHeight;
-              offscreenCtx.drawImage(videoElement, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-              
-              await pose.send({ image: offscreenCanvas })
-              setErr('') // clear error once AI successfully processes a frame
+              await pose.send({ image: videoElement })
+              setErr('')
             } catch (e) {
-              console.warn("processFrame error:", e)
+              console.warn(e)
             }
-          }
-          if (running) {
-            animationFrameId = requestAnimationFrame(processFrame)
-          }
-        }
-        processFrame()
-        
+          },
+          width: 640,
+          height: 480
+        })
+        camera.start()
       } catch (e) {
-        setErr('Camera error: ' + e.message)
+        setErr('Camera Utils Error: ' + e.message)
       }
     }
 
     startMediaPipe()
 
     return () => {
-      if (animationFrameId) cancelAnimationFrame(animationFrameId)
+      if (camera) camera.stop()
       if (canvasRef.current) {
          const ctx = canvasRef.current.getContext('2d')
          ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
