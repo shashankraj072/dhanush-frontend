@@ -230,6 +230,100 @@ export default function Workout() {
                speakFeedback(msg)
                currAccuracy = 0.5
             }
+          } else if (exerciseId === 'pushup') {
+            if (shoulder && elbow && wrist && shoulder.visibility > 0.2 && elbow.visibility > 0.2) {
+              const armAngle = calculateAngle(shoulder, elbow, wrist)
+              feedback.push(`Arm Angle: ${Math.round(armAngle)}°`)
+              let stage = repStateRef.current.stage
+              let count = repStateRef.current.count
+              
+              if (armAngle > 140) {
+                stage = 'up'
+              }
+              if (armAngle < 90 && stage === 'up') {
+                stage = 'down'
+                count += 1
+                speakFeedback(count.toString(), true)
+              }
+              
+              // Posture check for straight back
+              if (hip && ankle) {
+                const bodyAngle = calculateAngle(shoulder, hip, ankle)
+                if (bodyAngle < 150) {
+                  const msg = "Keep your back straight!"
+                  feedback.push(msg)
+                  speakFeedback(msg)
+                  currAccuracy = 0.6
+                }
+              }
+              
+              repStateRef.current = { count, stage }
+              setRepState({ count, stage })
+            } else {
+               const msg = "Arms not fully visible."
+               feedback.push(msg)
+               speakFeedback(msg)
+               currAccuracy = 0.5
+            }
+          } else if (exerciseId === 'lunge') {
+            if (hip && knee && ankle && hip.visibility > 0.2 && knee.visibility > 0.2) {
+              const legAngle = calculateAngle(hip, knee, ankle)
+              feedback.push(`Knee Angle: ${Math.round(legAngle)}°`)
+              let stage = repStateRef.current.stage
+              let count = repStateRef.current.count
+              
+              if (legAngle > 140) {
+                stage = 'up'
+              }
+              if (legAngle < 90 && stage === 'up') {
+                stage = 'down'
+                count += 1
+                speakFeedback(count.toString(), true)
+              }
+              
+              repStateRef.current = { count, stage }
+              setRepState({ count, stage })
+            } else {
+               const msg = "Legs not fully visible."
+               feedback.push(msg)
+               speakFeedback(msg)
+               currAccuracy = 0.5
+            }
+          } else if (exerciseId === 'plank') {
+            if (shoulder && hip && ankle && shoulder.visibility > 0.2 && hip.visibility > 0.2) {
+              const bodyAngle = calculateAngle(shoulder, hip, ankle)
+              feedback.push(`Body Angle: ${Math.round(bodyAngle)}°`)
+              
+              if (bodyAngle > 160) {
+                // Good form
+                feedback.push("Good form! Hold it.")
+                currAccuracy = 1.0
+                
+                if (!repStateRef.current.plankStart) {
+                   repStateRef.current.plankStart = Date.now()
+                }
+                // Calculate seconds held
+                const heldSeconds = Math.floor((Date.now() - repStateRef.current.plankStart) / 1000)
+                setRepState({ count: heldSeconds, stage: 'holding' })
+                
+                // Speak every 10 seconds
+                if (heldSeconds > 0 && heldSeconds % 10 === 0) {
+                  speakFeedback(`${heldSeconds} seconds`, true)
+                }
+              } else {
+                // Bad form
+                repStateRef.current.plankStart = null // Reset timer on form break
+                const msg = "Keep your body in a straight line!"
+                feedback.push(msg)
+                speakFeedback(msg)
+                currAccuracy = 0.5
+              }
+            } else {
+               const msg = "Full body not visible for plank."
+               feedback.push(msg)
+               speakFeedback(msg)
+               currAccuracy = 0.5
+            }
           } else {
             feedback.push("Rep counting not available for this exercise yet.")
             currAccuracy = 0.9

@@ -60,33 +60,33 @@ export default function Dashboard() {
       {data?.stats ? (
         <>
           <div className="statsGrid">
-            <div className="statCard">
+            <div className="statCard animate-up delay-1">
               <div className="statLabel">Completion rate</div>
               <div className="statValue">{completionPct}%</div>
               <div className="progressRing" style={{ '--p': `${completionPct}%` }}>
                 <span>{completionPct}%</span>
               </div>
             </div>
-            <div className="statCard">
+            <div className="statCard animate-up delay-2">
               <div className="statLabel">Posture quality</div>
               <div className="statValue">{posturePct}%</div>
               <div className="progressRing" style={{ '--p': `${posturePct}%` }}>
                 <span>{posturePct}%</span>
               </div>
             </div>
-            <div className="statCard">
+            <div className="statCard animate-up delay-3">
               <div className="statLabel">Calories burned</div>
               <div className="statValue">{data.stats.estimatedCaloriesBurned}</div>
               <div className="muted">Estimated total from completed workouts</div>
             </div>
-            <div className="statCard">
+            <div className="statCard animate-up delay-4">
               <div className="statLabel">Sessions completed</div>
               <div className="statValue">{data.stats.completedWorkouts}</div>
               <div className="muted">Out of {data.stats.totalLogs} logged entries</div>
             </div>
           </div>
 
-          <div className="pillRow">
+          <div className="pillRow animate-up delay-4">
             <span className="pill">Logs: {data.stats.totalLogs}</span>
             <span className="pill">Completed: {data.stats.completedWorkouts}</span>
             <span className="pill">

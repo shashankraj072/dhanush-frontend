@@ -58,7 +58,7 @@ export default function Profile() {
       </div>
 
       <form className="form" onSubmit={onSave}>
-        <div className="grid2">
+        <div className="grid2 animate-up delay-1">
           <label>
             <div className="label">User ID</div>
             <input value={userId} onChange={(e) => setUserId(e.target.value)} />
@@ -69,7 +69,7 @@ export default function Profile() {
           </label>
         </div>
 
-        <div className="grid3">
+        <div className="grid3 animate-up delay-2">
           <label>
             <div className="label">Age</div>
             <input

@@ -12,11 +12,11 @@
   inset: -20vmax;
   z-index: -2;
   background:
-    radial-gradient(40vmax 40vmax at 12% 10%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 65%),
-    radial-gradient(36vmax 36vmax at 88% 18%, rgba(56, 189, 248, 0.16) 0%, transparent 68%),
-    radial-gradient(34vmax 34vmax at 50% 95%, rgba(34, 197, 94, 0.12) 0%, transparent 70%);
-  filter: blur(18px) saturate(1.1);
-  animation: ambientDrift 22s ease-in-out infinite alternate;
+    radial-gradient(50vmax 50vmax at 12% 10%, color-mix(in srgb, var(--accent) 40%, transparent) 0%, transparent 75%),
+    radial-gradient(45vmax 45vmax at 88% 18%, rgba(56, 189, 248, 0.35) 0%, transparent 75%),
+    radial-gradient(40vmax 40vmax at 50% 95%, rgba(34, 197, 94, 0.3) 0%, transparent 75%);
+  filter: blur(24px) saturate(1.3);
+  animation: ambientDrift 18s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
@@ -128,14 +128,15 @@
 }
 
 .card {
-  border: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--bg) 96%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
-  border-radius: 22px;
-  padding: 22px;
-  box-shadow: var(--shadow);
-  transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
-  animation: fadeSlideIn 0.4s ease both;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05), inset 0 0 0 1px color-mix(in srgb, var(--bg) 50%, transparent);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .card:hover {
@@ -633,5 +634,20 @@ select:focus {
   }
   .workoutHero {
     grid-template-columns: 1fr;
-  }
+}
+
+/* Animation utilities for staggered entry */
+.delay-1 { animation-delay: 0.1s !important; }
+.delay-2 { animation-delay: 0.2s !important; }
+.delay-3 { animation-delay: 0.3s !important; }
+.delay-4 { animation-delay: 0.4s !important; }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-up {
+  opacity: 0;
+  animation: fadeSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
