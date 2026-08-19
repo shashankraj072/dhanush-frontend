@@ -226,14 +226,12 @@ export default function Workout() {
       let animationFrameId = null
       
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } })
+        // Use the simplest video request to avoid OverconstrainedError
+        stream = await navigator.mediaDevices.getUserMedia({ video: true })
         videoElement.srcObject = stream
-        await new Promise(resolve => {
-          videoElement.onloadedmetadata = () => {
-            videoElement.play()
-            resolve()
-          }
-        })
+        
+        // Force play unconditionally
+        videoElement.play().catch(e => console.warn("Video play error: ", e))
         
         // Custom camera loop
         async function processFrame() {
@@ -351,8 +349,8 @@ export default function Workout() {
             </div>
 
             <div className="videoWrap" style={{ position: 'relative', width: '100%', maxWidth: '640px', height: '480px', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden' }}>
-              {/* Hide the raw video using opacity instead of display:none to prevent browser throttling */}
-              <video ref={videoRef} playsInline muted style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', zIndex: -1 }} />
+              {/* Force the raw video to be completely visible to the browser to bypass any battery saving blocks, but hide it behind the canvas */}
+              <video ref={videoRef} autoPlay playsInline muted style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
               <canvas ref={canvasRef} width="640" height="480" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
               
               {!running && (
