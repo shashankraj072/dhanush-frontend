@@ -93,8 +93,9 @@ export default function Workout() {
   }, [user?.userId])
 
   useEffect(() => {
-    let camera = null
     let pose = null
+    let stream = null
+    let animationFrameId = null
 
     async function startMediaPipe() {
       if (!running) {
@@ -110,11 +111,18 @@ export default function Workout() {
       
       const canvasCtx = canvasElement.getContext('2d')
 
-      pose = new Pose({
-        locateFile: (file) => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-        }
-      })
+      try {
+        // Safe access for Vite production build interop
+        const PoseClass = window.Pose || window.pose?.Pose || Pose
+        pose = new PoseClass({
+          locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          }
+        })
+      } catch(e) {
+        setErr('Failed to load AI Model: ' + e.message)
+        return
+      }
 
       pose.setOptions({
         modelComplexity: 1,
@@ -223,9 +231,6 @@ export default function Workout() {
         canvasCtx.restore()
       })
 
-      let stream = null
-      let animationFrameId = null
-      
       try {
         setErr('Requesting camera...')
         stream = await navigator.mediaDevices.getUserMedia({ video: true })
