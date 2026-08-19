@@ -164,13 +164,14 @@ export default function Workout() {
             
             if (hip && knee && ankle && hip.visibility > 0.5) {
               const angle = calculateAngle(hip, knee, ankle)
+              feedback.push(`Squat Angle: ${Math.round(angle)}°`)
               let stage = repStateRef.current.stage
               let count = repStateRef.current.count
               
-              if (angle > 160) {
+              if (angle > 140) {
                 stage = 'up'
               }
-              if (angle < 90 && stage === 'up') {
+              if (angle < 100 && stage === 'up') {
                 stage = 'down'
                 count += 1
                 feedback.push("Good depth!")
@@ -182,7 +183,7 @@ export default function Workout() {
                 speakFeedback(msg)
                 currAccuracy = 0.8
               }
-              if (stage === 'down' && angle > 100 && angle < 150) {
+              if (stage === 'down' && angle > 100 && angle < 140) {
                 const msg = "Push all the way up!"
                 feedback.push(msg)
                 speakFeedback(msg)
@@ -203,13 +204,14 @@ export default function Workout() {
             
             if (shoulder && elbow && wrist && shoulder.visibility > 0.5 && elbow.visibility > 0.5 && wrist.visibility > 0.5) {
               const angle = calculateAngle(shoulder, elbow, wrist)
+              feedback.push(`Curl Angle: ${Math.round(angle)}°`)
               let stage = repStateRef.current.stage
               let count = repStateRef.current.count
               
-              if (angle > 160) {
+              if (angle > 140) {
                 stage = 'down'
               }
-              if (angle < 45 && stage === 'down') {
+              if (angle < 70 && stage === 'down') {
                 stage = 'up'
                 count += 1
                 speakFeedback(count.toString(), true)
@@ -218,7 +220,7 @@ export default function Workout() {
               repStateRef.current = { count, stage }
               setRepState({ count, stage })
             } else {
-               const msg = "Left arm not visible."
+               const msg = "Left arm not fully visible."
                feedback.push(msg)
                speakFeedback(msg)
                currAccuracy = 0.5
