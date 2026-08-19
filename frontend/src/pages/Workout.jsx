@@ -47,6 +47,24 @@ export default function Workout() {
   
   const [repState, setRepState] = useState({ count: 0, stage: 'up' })
   const repStateRef = useRef({ count: 0, stage: 'up' })
+  const lastSpokenRef = useRef({})
+
+  function speakFeedback(text, isRep = false) {
+    if (!window.speechSynthesis) return
+    const now = Date.now()
+    const lastSpoken = lastSpokenRef.current[text] || 0
+    
+    // Wait 3 seconds before repeating the same posture warning. Reps are spoken immediately.
+    if (isRep || now - lastSpoken > 3000) {
+      // Clear the queue if it's a new rep to ensure instant counting
+      if (isRep) window.speechSynthesis.cancel()
+      
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.rate = 1.1
+      window.speechSynthesis.speak(utterance)
+      lastSpokenRef.current[text] = now
+    }
+  }
 
   const avgAccuracy = useMemo(() => {
     if (!samples.length) return 0
@@ -75,8 +93,12 @@ export default function Workout() {
     let pose = null
 
     async function startMediaPipe() {
-      if (!running) return
+      if (!running) {
+        window.speechSynthesis?.cancel()
+        return
+      }
       setErr('')
+      speakFeedback("AI Tracking started. Please stand in frame.", false)
       
       const videoElement = videoRef.current
       const canvasElement = canvasRef.current
@@ -132,19 +154,26 @@ export default function Workout() {
                 stage = 'down'
                 count += 1
                 feedback.push("Good depth!")
+                speakFeedback(count.toString(), true)
               }
               if (angle < 60) {
-                feedback.push("Going too low, protect your knees!")
+                const msg = "Going too low, protect your knees!"
+                feedback.push(msg)
+                speakFeedback(msg)
                 currAccuracy = 0.8
               }
               if (stage === 'down' && angle > 100 && angle < 150) {
-                feedback.push("Push all the way up!")
+                const msg = "Push all the way up!"
+                feedback.push(msg)
+                speakFeedback(msg)
               }
               
               repStateRef.current = { count, stage }
               setRepState({ count, stage })
             } else {
-               feedback.push("Please stand further back. Full legs must be visible.")
+               const msg = "Please stand further back."
+               feedback.push(msg)
+               speakFeedback(msg)
                currAccuracy = 0.5
             }
           } else if (exerciseId === 'bicep_curl') {
@@ -163,12 +192,15 @@ export default function Workout() {
               if (angle < 45 && stage === 'down') {
                 stage = 'up'
                 count += 1
+                speakFeedback(count.toString(), true)
               }
               
               repStateRef.current = { count, stage }
               setRepState({ count, stage })
             } else {
-               feedback.push("Left arm not visible.")
+               const msg = "Left arm not visible."
+               feedback.push(msg)
+               speakFeedback(msg)
                currAccuracy = 0.5
             }
           } else {
