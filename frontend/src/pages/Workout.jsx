@@ -298,9 +298,9 @@ export default function Workout() {
             </div>
 
             <div className="videoWrap" style={{ position: 'relative', width: '100%', maxWidth: '640px', height: '480px', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden' }}>
-              {/* Hide the raw video, only show the canvas overlay */}
-              <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
-              <canvas ref={canvasRef} width="640" height="480" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {/* Hide the raw video using opacity instead of display:none to prevent browser throttling */}
+              <video ref={videoRef} playsInline muted style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', zIndex: -1 }} />
+              <canvas ref={canvasRef} width="640" height="480" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
               
               {!running && (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
