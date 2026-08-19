@@ -162,7 +162,7 @@ export default function Workout() {
             const knee = landmarks[25] // Left knee
             const ankle = landmarks[27] // Left ankle
             
-            if (hip && knee && ankle && hip.visibility > 0.5) {
+            if (hip && knee && ankle && hip.visibility > 0.2) {
               const angle = calculateAngle(hip, knee, ankle)
               feedback.push(`Squat Angle: ${Math.round(angle)}°`)
               let stage = repStateRef.current.stage
@@ -202,7 +202,7 @@ export default function Workout() {
             const elbow = landmarks[13] // Left elbow
             const wrist = landmarks[15] // Left wrist
             
-            if (shoulder && elbow && wrist && shoulder.visibility > 0.5 && elbow.visibility > 0.5 && wrist.visibility > 0.5) {
+            if (shoulder && elbow && wrist && shoulder.visibility > 0.2 && elbow.visibility > 0.2 && wrist.visibility > 0.2) {
               const angle = calculateAngle(shoulder, elbow, wrist)
               feedback.push(`Curl Angle: ${Math.round(angle)}°`)
               let stage = repStateRef.current.stage
