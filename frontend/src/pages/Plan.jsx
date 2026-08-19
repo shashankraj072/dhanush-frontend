@@ -54,80 +54,87 @@ export default function Plan() {
         {err ? <div className="error">{err}</div> : null}
         {data?.plan ? (
           <>
-            <div className="statsGrid compactStats">
-              <div className="statCard">
-                <div className="statLabel">Goal</div>
-                <div className="statValue small">{data.plan.goal.replace('_', ' ')}</div>
+            <div className="grid2">
+              <div className="statCard animate-up delay-1">
+                <div className="statLabel" style={{fontSize: '11px', textTransform:'uppercase'}}>Goal</div>
+                <div className="statValue" style={{fontSize: '22px'}}>
+                  {data.plan.goal.replace('_', ' ')}
+                </div>
               </div>
-              <div className="statCard">
-                <div className="statLabel">Difficulty</div>
-                <div className="statValue small">{data.plan.level}</div>
+              <div className="statCard animate-up delay-2">
+                <div className="statLabel" style={{fontSize: '11px', textTransform:'uppercase'}}>Difficulty</div>
+                <div className="statValue" style={{fontSize: '22px'}}>
+                  {data.plan.level}
+                </div>
               </div>
-              <div className="statCard">
-                <div className="statLabel">Calories</div>
-                <div className="statValue small">{data.plan.estimatedCalories}</div>
+              <div className="statCard animate-up delay-3">
+                <div className="statLabel" style={{fontSize: '11px', textTransform:'uppercase'}}>Calories</div>
+                <div className="statValue" style={{fontSize: '22px'}}>
+                  {data.plan.estimatedCalories}
+                </div>
               </div>
-              <div className="statCard">
-                <div className="statLabel">Duration</div>
-                <div className="statValue small">{data.plan.workoutMinutes} min</div>
+              <div className="statCard animate-up delay-4">
+                <div className="statLabel" style={{fontSize: '11px', textTransform:'uppercase'}}>Duration</div>
+                <div className="statValue" style={{fontSize: '22px'}}>
+                  {data.plan.workoutMinutes} Min
+                </div>
               </div>
             </div>
-            <div className="pillRow">
+
+            <div className="pillRow animate-up delay-4">
               <span className="pill">Goal: {data.plan.goal}</span>
               <span className="pill">Level: {data.plan.level}</span>
               {data.plan.focus && <span className="pill">Focus: {data.plan.focus}</span>}
               {data.plan.weeklyChallenge && <span className="pill">Challenge: {data.plan.weeklyChallenge}</span>}
-              <span className="pill">
-                Est. calories: {data.plan.estimatedCalories}
-              </span>
+              <span className="pill">Est. calories: {data.plan.estimatedCalories}</span>
               <span className="pill">Minutes: {data.plan.workoutMinutes}</span>
             </div>
 
-            <div className="grid2">
-              <div className="panel">
-                <h2>Workout</h2>
-                <ul className="list">
+            <div className="grid2" style={{marginTop: '20px', alignItems: 'start'}}>
+              {/* Workouts */}
+              <div className="card animate-up delay-2" style={{padding: '24px'}}>
+                <h2 style={{fontSize: '20px', marginBottom: '16px'}}>Workout</h2>
+                <div className="stack">
                   {data.plan.exercises.map((e) => (
-                    <li key={e.id} className="listItem">
-                      <div className="listTitle">{e.name}</div>
-                      <div className="muted">
-                        {e.sets} sets · {e.reps}
-                      </div>
-                      <div className="muted">{e.notes}</div>
-                    </li>
+                    <div key={e.id} className="statCard" style={{textAlign: 'left', padding: '16px'}}>
+                      <div style={{fontWeight: 600, color: 'var(--text-h)', marginBottom: '4px'}}>{e.name}</div>
+                      <div style={{fontSize: '13px', color: 'var(--text)', marginBottom: '8px'}}>{e.sets} sets · {e.reps}</div>
+                      <div style={{fontSize: '14px', color: 'var(--text-h)'}}>{e.notes}</div>
+                    </div>
                   ))}
-                </ul>
-                <div className="row">
-                  <Link className="primaryBtn" to="/workout">
-                    Start workout (webcam)
-                  </Link>
-                  <Link className="ghostBtn" to="/dashboard">
-                    View dashboard
-                  </Link>
+                  <div style={{display:'flex', gap: '10px', marginTop: '10px'}}>
+                    <Link to="/workout" className="button" style={{flex: 1, justifyContent:'center'}}>Start workout (webcam)</Link>
+                    <Link to="/dashboard" className="button button-outline">View dashboard</Link>
+                  </div>
                 </div>
               </div>
 
-              <div className="panel">
-                <h2>Meal suggestions</h2>
-                <div className="muted">
-                  Rule-based for your goal (MVP).
-                </div>
-                <ul className="list">
+              {/* Meals */}
+              <div className="card animate-up delay-3" style={{padding: '24px'}}>
+                <h2 style={{fontSize: '20px', marginBottom: '16px'}}>Meal suggestions</h2>
+                <p className="muted" style={{marginBottom: '16px'}}>Rule-based for your goal (MVP).</p>
+                
+                <div className="stack" style={{gap: '12px'}}>
                   {data.meals.rules.map((r, idx) => (
-                    <li key={idx} className="listItem">
+                    <div key={idx} className="statCard" style={{textAlign: 'left', padding: '12px 16px', fontSize: '14px'}}>
                       {r}
-                    </li>
+                    </div>
                   ))}
-                </ul>
-                <div className="subTitle">Examples</div>
-                <ul className="list">
+                </div>
+
+                <h3 style={{fontSize: '16px', marginTop: '24px', marginBottom: '12px', color: 'var(--text-h)'}}>Examples</h3>
+                <div className="stack" style={{gap: '12px'}}>
                   {data.meals.meals.map((m) => (
-                    <li key={m.name} className="listItem">
-                      <div className="listTitle">{m.name}</div>
-                      <div className="muted">{m.details}</div>
-                    </li>
+                    <div key={m.name} className="statCard" style={{textAlign: 'left', padding: '12px 16px'}}>
+                      <div style={{fontWeight: 600, textTransform: 'capitalize', color: 'var(--text-h)', marginBottom: '4px'}}>
+                        {m.name}
+                      </div>
+                      <div style={{fontSize: '14px', color: 'var(--text)'}}>
+                        {m.details}
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
           </>
