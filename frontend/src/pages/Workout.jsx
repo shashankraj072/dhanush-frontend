@@ -125,7 +125,7 @@ export default function Workout() {
       }
 
       pose.setOptions({
-        modelComplexity: 1,
+        modelComplexity: 0, // Lower complexity to fix GPU precision failures on some devices
         smoothLandmarks: true,
         enableSegmentation: false,
         smoothSegmentation: false,
@@ -137,6 +137,13 @@ export default function Workout() {
         try {
           canvasCtx.save()
           canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height)
+          
+          // Debug: draw the exact image MediaPipe saw to prove if it is black or not
+          if (results.image) {
+             canvasCtx.globalAlpha = 0.3;
+             canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+             canvasCtx.globalAlpha = 1.0;
+          }
 
           if (results.poseLandmarks) {
             const SafeConnections = window.POSE_CONNECTIONS || window.pose?.POSE_CONNECTIONS || POSE_CONNECTIONS
