@@ -134,21 +134,21 @@ export default function Workout() {
       })
 
       pose.onResults((results) => {
-        canvasCtx.save()
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height)
-        
-        // We no longer draw the video image on the canvas. 
-        // We let the native <video> element show through underneath!
-        // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height)
+        try {
+          canvasCtx.save()
+          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height)
 
-        if (results.poseLandmarks) {
-          drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 })
-          drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 })
-
+          if (results.poseLandmarks) {
+            const SafeConnections = window.POSE_CONNECTIONS || window.pose?.POSE_CONNECTIONS || POSE_CONNECTIONS
+            const safeDrawConnectors = window.drawConnectors || drawConnectors
+            const safeDrawLandmarks = window.drawLandmarks || drawLandmarks
+            
+            safeDrawConnectors(canvasCtx, results.poseLandmarks, SafeConnections, { color: '#00FF00', lineWidth: 4 })
+            safeDrawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 })
+            
           // Rep counting logic
           let feedback = []
           let currAccuracy = 1.0
-          const landmarks = results.poseLandmarks
           
           if (exerciseId === 'squat') {
             const hip = landmarks[23] // Left hip
@@ -229,6 +229,10 @@ export default function Workout() {
           setAccuracy(0)
         }
         canvasCtx.restore()
+        } catch (e) {
+          console.warn("onResults error:", e)
+          setErr('AI Error: ' + e.message)
+        }
       })
 
       try {
