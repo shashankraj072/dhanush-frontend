@@ -227,35 +227,48 @@ export default function Workout() {
       let animationFrameId = null
       
       try {
-        // Use the simplest video request to avoid OverconstrainedError
+        setErr('Requesting camera...')
         stream = await navigator.mediaDevices.getUserMedia({ video: true })
         videoElement.srcObject = stream
+        setErr('Camera granted. Starting video...')
         
         // Force play unconditionally
-        videoElement.play().catch(e => console.warn("Video play error: ", e))
+        videoElement.play().then(() => {
+          setErr('Video playing. Loading AI...')
+        }).catch(e => {
+          setErr('Video play error: ' + e.message)
+        })
         
         // Custom camera loop
         async function processFrame() {
+          if (!running) return
           if (videoElement.readyState >= 2) {
-            await pose.send({ image: videoElement })
+            try {
+              await pose.send({ image: videoElement })
+              setErr('') // clear error once AI successfully processes a frame
+            } catch (e) {
+              console.warn(e)
+            }
           }
-          animationFrameId = requestAnimationFrame(processFrame)
+          if (running) {
+            animationFrameId = requestAnimationFrame(processFrame)
+          }
         }
         processFrame()
         
       } catch (e) {
-        setErr('Camera failed to start: ' + e.message)
+        setErr('Camera error: ' + e.message)
       }
     }
 
     startMediaPipe()
 
     return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId)
       if (canvasRef.current) {
          const ctx = canvasRef.current.getContext('2d')
          ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
       }
-      if (camera) camera.stop()
       if (pose) pose.close()
       if (videoRef.current && videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach(t => t.stop())
