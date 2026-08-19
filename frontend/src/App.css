@@ -12,11 +12,12 @@
   inset: -20vmax;
   z-index: -2;
   background:
-    radial-gradient(50vmax 50vmax at 12% 10%, color-mix(in srgb, var(--accent) 40%, transparent) 0%, transparent 75%),
-    radial-gradient(45vmax 45vmax at 88% 18%, rgba(56, 189, 248, 0.35) 0%, transparent 75%),
-    radial-gradient(40vmax 40vmax at 50% 95%, rgba(34, 197, 94, 0.3) 0%, transparent 75%);
-  filter: blur(24px) saturate(1.3);
-  animation: ambientDrift 18s ease-in-out infinite alternate;
+    radial-gradient(60vmax 60vmax at 10% 10%, rgba(139, 92, 246, 0.45) 0%, transparent 80%),
+    radial-gradient(55vmax 55vmax at 90% 20%, rgba(14, 165, 233, 0.4) 0%, transparent 80%),
+    radial-gradient(50vmax 50vmax at 50% 90%, rgba(16, 185, 129, 0.35) 0%, transparent 80%),
+    radial-gradient(40vmax 40vmax at 80% 80%, rgba(236, 72, 153, 0.3) 0%, transparent 70%);
+  filter: blur(30px) saturate(1.8);
+  animation: ambientDrift 15s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
@@ -141,11 +142,12 @@
   animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 .card:hover {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--accent-border) 50%, var(--border));
+  transform: translateY(-4px);
+  border-color: rgba(192, 132, 252, 0.4);
   box-shadow:
-    rgba(0, 0, 0, 0.2) 0 18px 28px -16px,
-    rgba(0, 0, 0, 0.12) 0 8px 14px -10px;
+    rgba(192, 132, 252, 0.15) 0 20px 40px -10px,
+    rgba(56, 189, 248, 0.1) 0 10px 20px -5px,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .cardHeader h1 {
@@ -259,14 +261,15 @@ select:focus {
 }
 
 .primaryBtn {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, #fff), var(--accent));
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.9), rgba(56, 189, 248, 0.85));
   color: #fff;
   border-color: transparent;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 20px -14px var(--accent);
+  box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .ghostBtn {
@@ -350,16 +353,18 @@ select:focus {
   font-family: var(--mono);
   font-size: 13px;
   padding: 8px 12px;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(56, 189, 248, 0.15));
+  border: 1px solid rgba(192, 132, 252, 0.3);
   border-radius: 999px;
   color: var(--text-h);
-  transition: transform 0.18s ease, border-color 0.18s ease;
+  box-shadow: 0 2px 10px rgba(192, 132, 252, 0.05);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .pill:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent-border) 60%, var(--border));
+  transform: translateY(-2px);
+  border-color: rgba(192, 132, 252, 0.6);
+  box-shadow: 0 4px 15px rgba(192, 132, 252, 0.15);
 }
 
 .repPill {
@@ -442,9 +447,9 @@ select:focus {
 }
 
 .primaryBtn:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 24px -16px var(--accent);
+  background: linear-gradient(135deg, rgba(192, 132, 252, 1), rgba(56, 189, 248, 1));
+  box-shadow: 0 6px 20px rgba(170, 59, 255, 0.5);
+  transform: translateY(-2px);
 }
 
 .ghostBtn:hover {
