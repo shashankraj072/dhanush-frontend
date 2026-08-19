@@ -194,7 +194,7 @@ export default function Workout() {
             const elbow = landmarks[13] // Left elbow
             const wrist = landmarks[15] // Left wrist
             
-            if (shoulder && elbow && wrist && shoulder.visibility > 0.5) {
+            if (shoulder && elbow && wrist && shoulder.visibility > 0.5 && elbow.visibility > 0.5 && wrist.visibility > 0.5) {
               const angle = calculateAngle(shoulder, elbow, wrist)
               let stage = repStateRef.current.stage
               let count = repStateRef.current.count
@@ -252,6 +252,10 @@ export default function Workout() {
         async function processFrame() {
           if (!running) return
           if (videoElement.readyState >= 2) {
+            // MediaPipe requires the exact HTML width/height properties to be set, otherwise it hangs!
+            videoElement.width = videoElement.videoWidth || 640;
+            videoElement.height = videoElement.videoHeight || 480;
+            
             try {
               await pose.send({ image: videoElement })
               setErr('') // clear error once AI successfully processes a frame
