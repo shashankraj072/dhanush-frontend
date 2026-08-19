@@ -156,15 +156,26 @@ export default function Workout() {
           // Rep counting logic
           let feedback = []
           let currAccuracy = 1.0
+          const landmarks = results.poseLandmarks
           
-          if (exerciseId === 'squat') {
-            const hip = landmarks[23] // Left hip
-            const knee = landmarks[25] // Left knee
-            const ankle = landmarks[27] // Left ankle
-            
+          const hip = landmarks[23]
+          const knee = landmarks[25]
+          const ankle = landmarks[27]
+          const shoulder = landmarks[11]
+          const elbow = landmarks[13]
+          const wrist = landmarks[15]
+          
+          // Always print angles if joints are visible, to prove AI is working
+          if (hip && knee && ankle && hip.visibility > 0.2) {
+             feedback.push(`Squat Angle: ${Math.round(calculateAngle(hip, knee, ankle))}°`)
+          }
+          if (shoulder && elbow && wrist && shoulder.visibility > 0.2) {
+             feedback.push(`Curl Angle: ${Math.round(calculateAngle(shoulder, elbow, wrist))}°`)
+          }
+          
+          if (exerciseId === 'squat' || exerciseId === 'squats') {
             if (hip && knee && ankle && hip.visibility > 0.2) {
               const angle = calculateAngle(hip, knee, ankle)
-              feedback.push(`Squat Angle: ${Math.round(angle)}°`)
               let stage = repStateRef.current.stage
               let count = repStateRef.current.count
               
@@ -192,19 +203,14 @@ export default function Workout() {
               repStateRef.current = { count, stage }
               setRepState({ count, stage })
             } else {
-               const msg = "Please stand further back."
+               const msg = "Please stand further back for squats."
                feedback.push(msg)
                speakFeedback(msg)
                currAccuracy = 0.5
             }
           } else if (exerciseId === 'bicep_curl') {
-            const shoulder = landmarks[11] // Left shoulder
-            const elbow = landmarks[13] // Left elbow
-            const wrist = landmarks[15] // Left wrist
-            
             if (shoulder && elbow && wrist && shoulder.visibility > 0.2 && elbow.visibility > 0.2 && wrist.visibility > 0.2) {
               const angle = calculateAngle(shoulder, elbow, wrist)
-              feedback.push(`Curl Angle: ${Math.round(angle)}°`)
               let stage = repStateRef.current.stage
               let count = repStateRef.current.count
               
