@@ -222,18 +222,28 @@ export default function Workout() {
         canvasCtx.restore()
       })
 
-      camera = new Camera(videoElement, {
-        onFrame: async () => {
+      let stream = null
+      let animationFrameId = null
+      
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } })
+        videoElement.srcObject = stream
+        await new Promise(resolve => {
+          videoElement.onloadedmetadata = () => {
+            videoElement.play()
+            resolve()
+          }
+        })
+        
+        // Custom camera loop
+        async function processFrame() {
           if (videoElement.readyState >= 2) {
             await pose.send({ image: videoElement })
           }
-        },
-        width: 640,
-        height: 480
-      })
-      
-      try {
-        await camera.start()
+          animationFrameId = requestAnimationFrame(processFrame)
+        }
+        processFrame()
+        
       } catch (e) {
         setErr('Camera failed to start: ' + e.message)
       }
@@ -242,8 +252,15 @@ export default function Workout() {
     startMediaPipe()
 
     return () => {
+      if (canvasRef.current) {
+         const ctx = canvasRef.current.getContext('2d')
+         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+      }
       if (camera) camera.stop()
       if (pose) pose.close()
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach(t => t.stop())
+      }
     }
   }, [running, exerciseId])
 
