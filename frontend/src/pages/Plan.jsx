@@ -75,6 +75,8 @@ export default function Plan() {
             <div className="pillRow">
               <span className="pill">Goal: {data.plan.goal}</span>
               <span className="pill">Level: {data.plan.level}</span>
+              {data.plan.focus && <span className="pill">Focus: {data.plan.focus}</span>}
+              {data.plan.weeklyChallenge && <span className="pill">Challenge: {data.plan.weeklyChallenge}</span>}
               <span className="pill">
                 Est. calories: {data.plan.estimatedCalories}
               </span>

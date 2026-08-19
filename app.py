@@ -97,16 +97,80 @@ def get_recommendations(user_id):
         print(f"ML Prediction Error: {e}")
         pass # fallback to Beginner
     
+    level_key = "Basic" if predicted_level == "Beginner" else predicted_level
+    
+    focus = "General Fitness"
+    weekly_challenge = "3 workouts/week"
+    exercises = []
+    
+    if goal == "weight_loss":
+        if level_key == "Basic":
+            focus = "Cardio + full body"
+            weekly_challenge = "3 workouts/week"
+            exercises = [
+                {"id": "fl_b_1", "name": "Walking", "sets": 3, "reps": "20 mins", "notes": "Brisk pace"},
+                {"id": "fl_b_2", "name": "Squats", "sets": 3, "reps": "15", "notes": "Bodyweight"},
+                {"id": "fl_b_3", "name": "Push-ups", "sets": 3, "reps": "10", "notes": "Knee push-ups if needed"},
+                {"id": "fl_b_4", "name": "Cycling", "sets": 1, "reps": "15 mins", "notes": "Moderate pace"}
+            ]
+        elif level_key == "Intermediate":
+            focus = "Strength + cardio"
+            weekly_challenge = "4 workouts/week"
+            exercises = [
+                {"id": "fl_i_1", "name": "Lunges", "sets": 4, "reps": "12/leg", "notes": "Keep chest up"},
+                {"id": "fl_i_2", "name": "Rows", "sets": 4, "reps": "15", "notes": "Use dumbbells or bands"},
+                {"id": "fl_i_3", "name": "Presses", "sets": 4, "reps": "12", "notes": "Overhead press"},
+                {"id": "fl_i_4", "name": "Brisk walking", "sets": 1, "reps": "30 mins", "notes": "Maintain elevated heart rate"}
+            ]
+        else: # Advanced
+            focus = "Strength + conditioning"
+            weekly_challenge = "4–5 workouts/week"
+            exercises = [
+                {"id": "fl_a_1", "name": "Compound exercises", "sets": 5, "reps": "10", "notes": "Heavy squats/deadlifts"},
+                {"id": "fl_a_2", "name": "Intervals", "sets": 8, "reps": "30s sprint / 30s rest", "notes": "High Intensity Interval Training"}
+            ]
+    elif goal == "muscle_gain":
+        if level_key == "Basic":
+            focus = "Full-body"
+            weekly_challenge = "3 workouts/week"
+            exercises = [
+                {"id": "mg_b_1", "name": "Squats", "sets": 3, "reps": "12", "notes": "Focus on form"},
+                {"id": "mg_b_2", "name": "Push-ups", "sets": 3, "reps": "10-15", "notes": "Full range of motion"},
+                {"id": "mg_b_3", "name": "Lunges", "sets": 3, "reps": "10/leg", "notes": "Controlled descent"},
+                {"id": "mg_b_4", "name": "Plank", "sets": 3, "reps": "45s", "notes": "Keep core tight"}
+            ]
+        elif level_key == "Intermediate":
+            focus = "Upper/Lower body"
+            weekly_challenge = "4 workouts/week"
+            exercises = [
+                {"id": "mg_i_1", "name": "Bench press", "sets": 4, "reps": "8-10", "notes": "Progressive overload"},
+                {"id": "mg_i_2", "name": "Rows", "sets": 4, "reps": "10", "notes": "Squeeze back muscles"},
+                {"id": "mg_i_3", "name": "Shoulder press", "sets": 4, "reps": "10", "notes": "Dumbbells or barbell"},
+                {"id": "mg_i_4", "name": "Leg press", "sets": 4, "reps": "12", "notes": "Don't lock knees"}
+            ]
+        else: # Advanced
+            focus = "Hypertrophy"
+            weekly_challenge = "5 workouts/week"
+            exercises = [
+                {"id": "mg_a_1", "name": "Compound + isolation exercises", "sets": 5, "reps": "8-12", "notes": "Mix heavy lifts with high volume isolations"}
+            ]
+    else:
+        focus = "General Fitness"
+        weekly_challenge = "3 workouts/week"
+        exercises = [
+            {"id": "def_1", "name": "Push-ups", "sets": 3, "reps": "10", "notes": "Modify as needed"},
+            {"id": "def_2", "name": "Squats", "sets": 3, "reps": "15", "notes": "Bodyweight"},
+            {"id": "def_3", "name": "Plank", "sets": 3, "reps": "60s", "notes": "Hold steady"}
+        ]
+        
     plan = {
         "goal": goal,
-        "level": predicted_level,
-        "estimatedCalories": 400 if predicted_level == 'Advanced' else (350 if predicted_level == 'Intermediate' else 300),
-        "workoutMinutes": 45 if predicted_level == 'Advanced' else (30 if predicted_level == 'Intermediate' else 20),
-        "exercises": [
-            {"id": "ex1", "name": "Push-ups", "sets": 4 if predicted_level == 'Advanced' else 3, "reps": "15-20" if predicted_level == 'Advanced' else "10-15", "notes": "Keep back straight"},
-            {"id": "ex2", "name": "Squats", "sets": 4 if predicted_level == 'Advanced' else 3, "reps": "20-25" if predicted_level == 'Advanced' else "15-20", "notes": "Go low"},
-            {"id": "ex3", "name": "Plank", "sets": 3, "reps": "90s" if predicted_level == 'Advanced' else "60s", "notes": "Hold steady"}
-        ]
+        "level": level_key,
+        "focus": focus,
+        "weeklyChallenge": weekly_challenge,
+        "estimatedCalories": 400 if level_key == 'Advanced' else (350 if level_key == 'Intermediate' else 300),
+        "workoutMinutes": 45 if level_key == 'Advanced' else (30 if level_key == 'Intermediate' else 20),
+        "exercises": exercises
     }
     if goal == "muscle_gain":
         meals = {
