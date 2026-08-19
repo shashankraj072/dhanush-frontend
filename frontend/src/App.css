@@ -634,6 +634,7 @@ select:focus {
   }
   .workoutHero {
     grid-template-columns: 1fr;
+  }
 }
 
 /* Animation utilities for staggered entry */
