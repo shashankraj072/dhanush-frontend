@@ -50,19 +50,23 @@ export default function Workout() {
   const lastSpokenRef = useRef({})
 
   function speakFeedback(text, isRep = false) {
-    if (!window.speechSynthesis) return
-    const now = Date.now()
-    const lastSpoken = lastSpokenRef.current[text] || 0
-    
-    // Wait 3 seconds before repeating the same posture warning. Reps are spoken immediately.
-    if (isRep || now - lastSpoken > 3000) {
-      // Clear the queue if it's a new rep to ensure instant counting
-      if (isRep) window.speechSynthesis.cancel()
+    try {
+      if (!window.speechSynthesis) return
+      const now = Date.now()
+      const lastSpoken = lastSpokenRef.current[text] || 0
       
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = 1.1
-      window.speechSynthesis.speak(utterance)
-      lastSpokenRef.current[text] = now
+      // Wait 3 seconds before repeating the same posture warning. Reps are spoken immediately.
+      if (isRep || now - lastSpoken > 3000) {
+        // Clear the queue if it's a new rep to ensure instant counting
+        if (isRep) window.speechSynthesis.cancel()
+        
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.rate = 1.1
+        window.speechSynthesis.speak(utterance)
+        lastSpokenRef.current[text] = now
+      }
+    } catch (e) {
+      console.warn("TTS Error: ", e)
     }
   }
 
@@ -94,7 +98,7 @@ export default function Workout() {
 
     async function startMediaPipe() {
       if (!running) {
-        window.speechSynthesis?.cancel()
+        try { window.speechSynthesis?.cancel() } catch(e) {}
         return
       }
       setErr('')
