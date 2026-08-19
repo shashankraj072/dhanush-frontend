@@ -248,19 +248,23 @@ export default function Workout() {
           setErr('Video play error: ' + e.message)
         })
         
+        // Create offscreen canvas for bulletproof frame extraction
+        const offscreenCanvas = document.createElement('canvas')
+        const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true })
+
         // Custom camera loop
         async function processFrame() {
           if (!running) return
-          if (videoElement.readyState >= 2) {
-            // MediaPipe requires the exact HTML width/height properties to be set, otherwise it hangs!
-            videoElement.width = videoElement.videoWidth || 640;
-            videoElement.height = videoElement.videoHeight || 480;
-            
+          if (videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
             try {
-              await pose.send({ image: videoElement })
+              offscreenCanvas.width = videoElement.videoWidth;
+              offscreenCanvas.height = videoElement.videoHeight;
+              offscreenCtx.drawImage(videoElement, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+              
+              await pose.send({ image: offscreenCanvas })
               setErr('') // clear error once AI successfully processes a frame
             } catch (e) {
-              console.warn(e)
+              console.warn("processFrame error:", e)
             }
           }
           if (running) {
