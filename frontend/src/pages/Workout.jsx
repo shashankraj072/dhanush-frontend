@@ -129,8 +129,9 @@ export default function Workout() {
         canvasCtx.save()
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height)
         
-        // Draw video frame on canvas
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height)
+        // We no longer draw the video image on the canvas. 
+        // We let the native <video> element show through underneath!
+        // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height)
 
         if (results.poseLandmarks) {
           drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 })
@@ -348,10 +349,10 @@ export default function Workout() {
               </button>
             </div>
 
-            <div className="videoWrap" style={{ position: 'relative', width: '100%', maxWidth: '640px', height: '480px', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden' }}>
+            <div className="videoWrap" style={{ position: 'relative', width: '100%', maxWidth: '640px', height: '480px', backgroundColor: '#222', borderRadius: '12px', overflow: 'hidden' }}>
               {/* Force the raw video to be completely visible to the browser to bypass any battery saving blocks, but hide it behind the canvas */}
-              <video ref={videoRef} autoPlay playsInline muted style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
-              <canvas ref={canvasRef} width="640" height="480" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
+              <video ref={videoRef} autoPlay playsInline muted style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, transform: 'scaleX(-1)' }} />
+              <canvas ref={canvasRef} width="640" height="480" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1, transform: 'scaleX(-1)' }} />
               
               {!running && (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
