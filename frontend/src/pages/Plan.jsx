@@ -43,7 +43,7 @@ export default function Plan() {
 
   return (
     <section className="stack">
-      <div className="card pageEnterPlan">
+      <div className="card pageEnter">
         <div className="cardHeader">
           <h1 className="heroTitle">Your plan</h1>
           <p className="muted">

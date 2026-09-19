@@ -46,7 +46,7 @@ export default function Profile() {
   }
 
   return (
-    <section className="card pageEnterProfile">
+    <section className="card pageEnter">
       <div className="cardHeader">
         <h1 className="heroTitle">Profile setup</h1>
         <p className="muted">Create a profile to get a personalized plan.</p>

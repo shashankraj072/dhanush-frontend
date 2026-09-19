@@ -484,23 +484,7 @@ select:focus {
   min-width: 210px;
 }
 
-.pageEnterPlan {
-  animation: origamiFold 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-  transform-origin: top center;
-  transform-style: preserve-3d;
-}
-
-.pageEnterDashboard {
-  animation: blurReveal 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.pageEnterWorkout {
-  animation: slideIn3D 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-.pageEnterProfile {
+.pageEnter {
   animation: liquidSwirl 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
