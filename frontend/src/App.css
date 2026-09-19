@@ -460,9 +460,10 @@ select:focus {
 
 .primaryBtn:active,
 .ghostBtn:active {
-  transform: scale(0.94) translateY(2px) rotate(-1.5deg);
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.3) !important;
-  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s !important;
+  transform: perspective(600px) rotateX(25deg) translateY(4px) scale(0.96);
+  box-shadow: inset 0 10px 15px rgba(0,0,0,0.5), 0 0px 5px rgba(192, 132, 252, 0.8) !important;
+  transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.1s !important;
+  transform-origin: bottom center;
 }
 
 .inlineField {
