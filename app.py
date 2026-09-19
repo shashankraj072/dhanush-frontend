@@ -231,21 +231,121 @@ def get_recommendations(user_id):
         
     return jsonify({"ok": True, "plan": plan, "meals": meals})
 
+import time
+from datetime import datetime, date
+
 @app.route('/api/workout/log', methods=['POST'])
 def log_workout():
     data = request.json
+    data['createdAtMs'] = int(time.time() * 1000)
     workouts.append(data)
+    return jsonify({"ok": True})
+
+@app.route('/api/water/log', methods=['POST'])
+def log_water():
+    data = request.json
+    userId = data.get('userId')
+    ml = data.get('ml', 0)
+    if userId not in profiles:
+        return jsonify({"ok": False, "error": "Profile not found"}), 404
+    
+    profile = profiles[userId]
+    if 'water_logs' not in profile:
+        profile['water_logs'] = []
+    
+    profile['water_logs'].append({
+        'ml': ml,
+        'timestamp': int(time.time() * 1000)
+    })
+    return jsonify({"ok": True})
+
+@app.route('/api/weight/log', methods=['POST'])
+def log_weight():
+    data = request.json
+    userId = data.get('userId')
+    weight = data.get('weight')
+    if userId not in profiles:
+        return jsonify({"ok": False, "error": "Profile not found"}), 404
+        
+    profile = profiles[userId]
+    if 'weight_history' not in profile:
+        profile['weight_history'] = []
+        
+    profile['weight_history'].append({
+        'weight': weight,
+        'timestamp': int(time.time() * 1000)
+    })
     return jsonify({"ok": True})
 
 @app.route('/api/progress/<user_id>', methods=['GET'])
 def get_progress(user_id):
     user_workouts = [w for w in workouts if w.get('userId') == user_id]
+    
+    # Calculate streak
+    streak = 0
+    if user_workouts:
+        # Sort workouts by date
+        sorted_workouts = sorted(user_workouts, key=lambda x: x.get('createdAtMs', 0), reverse=True)
+        workout_dates = sorted(list(set([
+            datetime.fromtimestamp(w.get('createdAtMs', 0) / 1000.0).date()
+            for w in sorted_workouts if w.get('createdAtMs')
+        ])), reverse=True)
+        
+        today = date.today()
+        if workout_dates:
+            # Check if there's a workout today or yesterday to start counting
+            if workout_dates[0] == today or (today - workout_dates[0]).days == 1:
+                streak = 1
+                for i in range(1, len(workout_dates)):
+                    if (workout_dates[i-1] - workout_dates[i]).days == 1:
+                        streak += 1
+                    else:
+                        break
+
+    # Calculate today's water
+    today_water_ml = 0
+    weight_history = []
+    
+    if user_id in profiles:
+        profile = profiles[user_id]
+        
+        # Calculate water for today
+        if 'water_logs' in profile:
+            today_start = datetime.combine(date.today(), datetime.min.time()).timestamp() * 1000
+            today_logs = [log for log in profile['water_logs'] if log['timestamp'] >= today_start]
+            today_water_ml = sum(log['ml'] for log in today_logs)
+            
+        # Get weight history
+        if 'weight_history' in profile:
+            weight_history = profile['weight_history']
+        elif 'weight' in profile:
+            # Add initial weight if no history
+            weight_history = [{'weight': profile['weight'], 'timestamp': int(time.time() * 1000)}]
+
+    total_calories = sum(w.get('estimatedCalories', 0) for w in user_workouts if w.get('completed'))
+    completed_workouts = len([w for w in user_workouts if w.get('completed')])
+    total_logs = len(user_workouts)
+    
+    # Posture accuracy avg
+    valid_accuracies = [w.get('postureAccuracy', 0) for w in user_workouts if 'postureAccuracy' in w]
+    avg_posture = sum(valid_accuracies) / len(valid_accuracies) if valid_accuracies else 0
+
     progress = {
-        "completedWorkouts": len(user_workouts),
-        "estimatedCalories": len(user_workouts) * 250,
-        "recentLogs": user_workouts[-5:]
+        "completedWorkouts": completed_workouts,
+        "totalLogs": total_logs,
+        "estimatedCaloriesBurned": total_calories,
+        "avgPostureAccuracy": avg_posture,
+        "streak": streak,
+        "todayWaterMl": today_water_ml,
+        "weightHistory": weight_history,
+        "recentLogs": user_workouts[-10:]
     }
-    return jsonify({"ok": True, "progress": progress})
+    
+    return jsonify({
+        "ok": True, 
+        "stats": progress,
+        "logs": sorted(user_workouts, key=lambda x: x.get('createdAtMs', 0), reverse=True)[:50]
+    })
 
 
 

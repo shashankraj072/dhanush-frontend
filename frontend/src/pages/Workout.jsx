@@ -45,6 +45,50 @@ export default function Workout() {
   const [durationMin, setDurationMin] = useState(5)
   const [saving, setSaving] = useState(false)
   
+  // Timer State
+  const [activeTime, setActiveTime] = useState(0)
+  const [isTimerActive, setIsTimerActive] = useState(false)
+  const [restTime, setRestTime] = useState(0)
+  const [isResting, setIsResting] = useState(false)
+  
+  // Timer effect
+  useEffect(() => {
+    let interval = null;
+    if (isTimerActive) {
+      interval = setInterval(() => {
+        setActiveTime((time) => time + 1);
+      }, 1000);
+    } else if (!isTimerActive && activeTime !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerActive, activeTime]);
+
+  // Rest effect
+  useEffect(() => {
+    let interval = null;
+    if (isResting && restTime > 0) {
+      interval = setInterval(() => {
+        setRestTime((time) => time - 1);
+      }, 1000);
+    } else if (restTime === 0 && isResting) {
+      setIsResting(false);
+      speakFeedback("Rest is over! Time for the next set.");
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isResting, restTime]);
+
+  const toggleTimer = () => setIsTimerActive(!isTimerActive);
+  const resetTimer = () => { setActiveTime(0); setIsTimerActive(false); }
+  const startRest = () => { setRestTime(60); setIsResting(true); setIsTimerActive(false); }
+  
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0')
+    const s = (secs % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
+  }
+  
   const [repState, setRepState] = useState({ count: 0, stage: 'up' })
   const repStateRef = useRef({ count: 0, stage: 'up' })
   const lastSpokenRef = useRef({})
@@ -436,6 +480,36 @@ export default function Workout() {
             <div className="counterLabel">Posture</div>
             <div className="counterValue">{accuracyPct}%</div>
             <div className="counterSub">avg accuracy</div>
+          </div>
+        </div>
+
+        <div className="panel" style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <div>
+              <div className="statLabel">Workout Time</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--mono)', color: isTimerActive ? 'var(--text-h)' : 'var(--text)' }}>
+                {formatTime(activeTime)}
+              </div>
+            </div>
+            {isResting && (
+              <div>
+                <div className="statLabel" style={{ color: 'var(--accent)' }}>Resting</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--mono)', color: 'var(--accent)' }}>
+                  {formatTime(restTime)}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="row">
+            <button className={isTimerActive ? "ghostBtn" : "primaryBtn"} onClick={toggleTimer}>
+              {isTimerActive ? 'Pause' : 'Start Set'}
+            </button>
+            <button className="ghostBtn" onClick={startRest} disabled={isResting}>
+              60s Rest
+            </button>
+            <button className="ghostBtn" onClick={resetTimer}>
+              Reset Timer
+            </button>
           </div>
         </div>
 

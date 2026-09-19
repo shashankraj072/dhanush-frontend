@@ -41,3 +41,11 @@ export function logWorkout(payload) {
 export function getProgress(userId) {
   return apiFetch(`/api/progress/${encodeURIComponent(userId)}`)
 }
+
+export function logWater(userId, ml) {
+  return apiFetch('/api/water/log', { method: 'POST', body: JSON.stringify({ userId, ml }) })
+}
+
+export function logWeight(userId, weight) {
+  return apiFetch('/api/weight/log', { method: 'POST', body: JSON.stringify({ userId, weight }) })
+}
