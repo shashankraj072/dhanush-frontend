@@ -458,12 +458,23 @@ select:focus {
   transform: translateY(-1px);
 }
 
-.primaryBtn:active,
-.ghostBtn:active {
+.primaryBtn:active {
   transform: perspective(600px) rotateX(25deg) translateY(4px) scale(0.96);
   box-shadow: inset 0 10px 15px rgba(0,0,0,0.5), 0 0px 5px rgba(192, 132, 252, 0.8) !important;
   transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.1s !important;
   transform-origin: bottom center;
+}
+
+@keyframes jellyPress {
+  0% { transform: scale(1, 1); }
+  25% { transform: scale(1.05, 0.9); }
+  50% { transform: scale(0.95, 1.05); }
+  75% { transform: scale(1.02, 0.95); }
+  100% { transform: scale(1, 1); }
+}
+
+.ghostBtn:active {
+  animation: jellyPress 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .inlineField {
@@ -473,10 +484,24 @@ select:focus {
   min-width: 210px;
 }
 
-.pageEnter {
+.pageEnterPlan {
   animation: origamiFold 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
   transform-origin: top center;
   transform-style: preserve-3d;
+}
+
+.pageEnterDashboard {
+  animation: blurReveal 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.pageEnterWorkout {
+  animation: slideIn3D 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.pageEnterProfile {
+  animation: liquidSwirl 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .statsGrid {
@@ -620,19 +645,25 @@ select:focus {
   }
 }
 
+@keyframes slideIn3D {
+  0% { opacity: 0; transform: translateX(100px) rotateY(-15deg) scale(0.9); }
+  100% { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); }
+}
+
+@keyframes blurReveal {
+  0% { opacity: 0; filter: blur(15px); transform: scale(1.1); }
+  100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+}
+
 @keyframes origamiFold {
-  0% {
-    opacity: 0;
-    transform: perspective(1200px) rotateX(-60deg) translateY(-50px) scale(0.9);
-  }
-  60% {
-    opacity: 1;
-    transform: perspective(1200px) rotateX(10deg) translateY(10px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: perspective(1200px) rotateX(0deg) translateY(0) scale(1);
-  }
+  0% { opacity: 0; transform: perspective(1200px) rotateX(-60deg) translateY(-50px) scale(0.9); }
+  60% { opacity: 1; transform: perspective(1200px) rotateX(10deg) translateY(10px) scale(1.02); }
+  100% { opacity: 1; transform: perspective(1200px) rotateX(0deg) translateY(0) scale(1); }
+}
+
+@keyframes liquidSwirl {
+  0% { opacity: 0; transform: scale(0.8) rotate(-10deg) skew(5deg); filter: blur(5px); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg) skew(0deg); filter: blur(0px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

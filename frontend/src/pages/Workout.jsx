@@ -463,7 +463,7 @@ export default function Workout() {
 
   return (
     <section className="stack">
-      <div className="card pageEnter">
+      <div className="card pageEnterWorkout">
         <div className="cardHeader">
           <h1 className="heroTitle">Workout + AI Pose Tracker</h1>
           <p className="muted">

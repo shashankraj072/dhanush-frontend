@@ -88,7 +88,7 @@ export default function Dashboard() {
   }
 
   return (
-    <section className="card pageEnter">
+    <section className="card pageEnterDashboard">
       <div className="cardHeader">
         <h1 className="heroTitle">Progress dashboard</h1>
         <p className="muted">
