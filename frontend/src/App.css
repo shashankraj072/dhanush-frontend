@@ -466,7 +466,9 @@ select:focus {
 }
 
 .pageEnter {
-  animation: zoomIn 0.42s ease both;
+  animation: slideIn3D 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .statsGrid {
@@ -610,14 +612,14 @@ select:focus {
   }
 }
 
-@keyframes zoomIn {
-  from {
-    transform: scale(0.985) translateY(8px);
+@keyframes slideIn3D {
+  0% {
     opacity: 0;
+    transform: translateX(100px) rotateY(-15deg) scale(0.9);
   }
-  to {
-    transform: scale(1) translateY(0);
+  100% {
     opacity: 1;
+    transform: translateX(0) rotateY(0deg) scale(1);
   }
 }
 
@@ -649,14 +651,21 @@ select:focus {
 .delay-3 { animation-delay: 0.3s !important; }
 .delay-4 { animation-delay: 0.4s !important; }
 
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fadeSlideUp3D {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px) rotateX(10deg); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) rotateX(0); 
+  }
 }
 
 .animate-up {
   opacity: 0;
-  animation: fadeSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fadeSlideUp3D 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-style: preserve-3d;
 }
 
 .streakBanner {
