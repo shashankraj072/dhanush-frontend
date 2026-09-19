@@ -1,9 +1,22 @@
+import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { clearUser, loadUser } from '../state'
 
 export default function Layout({ children }) {
   const nav = useNavigate()
   const user = loadUser()
+  
+  // Theme state
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   return (
     <div className="appShell">
@@ -30,6 +43,14 @@ export default function Layout({ children }) {
           </NavLink>
         </nav>
         <div className="userPill">
+          <button 
+            className="ghostBtn" 
+            onClick={toggleTheme} 
+            title="Toggle theme" 
+            style={{ padding: '6px', minWidth: '32px', display: 'flex', justifyContent: 'center' }}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <span className="userId">{user?.userId || 'no user'}</span>
           <button
             className="ghostBtn"

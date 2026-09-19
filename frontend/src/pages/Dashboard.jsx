@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getProgress, logWater } from '../api'
 import { loadUser } from '../state'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function Dashboard() {
   const user = loadUser()
@@ -14,6 +14,19 @@ export default function Dashboard() {
   const completionPct = data?.stats?.totalLogs
     ? Math.round((Number(data?.stats?.completedWorkouts || 0) / Number(data?.stats?.totalLogs || 1)) * 100)
     : 0
+
+  // Aggregate calories by day
+  const caloriesByDay = (data?.logs || []).reduce((acc, log) => {
+    if (!log.createdAtMs || !log.completed) return acc;
+    const date = new Date(log.createdAtMs).toLocaleDateString();
+    acc[date] = (acc[date] || 0) + (log.estimatedCalories || 0);
+    return acc;
+  }, {});
+  
+  const caloriesData = Object.keys(caloriesByDay)
+    .sort((a, b) => new Date(a) - new Date(b))
+    .slice(-7) // last 7 days
+    .map(date => ({ date, calories: caloriesByDay[date] }));
     
   const fetchProgress = async (isSilent = false) => {
     if (!user?.userId) return
@@ -163,6 +176,27 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          <div className="panel animate-up delay-4" style={{ marginBottom: '2rem' }}>
+            <h2>Calories Burned (Last 7 Days)</h2>
+            <div style={{ width: '100%', height: '200px', marginTop: '1rem' }}>
+              {caloriesData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={caloriesData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis dataKey="date" stroke="#aaa" />
+                    <YAxis stroke="#aaa" />
+                    <Tooltip contentStyle={{ backgroundColor: '#222', border: '1px solid #444', borderRadius: '8px' }} />
+                    <Bar dataKey="calories" fill="var(--accent)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="muted" style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                  Complete workouts to see your calorie burn history.
+                </div>
+              )}
             </div>
           </div>
 
