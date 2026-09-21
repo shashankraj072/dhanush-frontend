@@ -74,7 +74,6 @@ export default function Coaches() {
 
       <div className="single-coach-profile">
         <div className="coach-images-row">
-          <img src="/coach.jpg" alt="Coach Dhanush" className="coach-main-photo" />
           <img src="/certificate.png" alt="Certificate" className="coach-certificate-img" />
         </div>
 
@@ -92,7 +91,7 @@ export default function Coaches() {
           </div>
           <div className="coach-info">
             <h3>Coach Dhanush</h3>
-            <span className="specialty">💪 Strength, 🏃 Cardio, 🧘 Yoga</span>
+            <span className="specialty">💪 Strength, 🏋️ Muscle Gain, 🔥 Fat Loss, 🏃 Cardio, 🧘 Yoga</span>
           </div>
           <button 
             className="start-call-btn"
