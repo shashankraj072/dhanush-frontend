@@ -1,15 +1,11 @@
-#!/bin/bash
-set -e
-# Build script for Render
+#!/usr/bin/env bash
+# Exit on error
+set -o errexit
 
-# 1. Activate Render's Python virtual environment
-source /opt/render/project/src/.venv/bin/activate || true
-
-# 2. Install Python dependencies
+echo "Installing Python dependencies..."
 pip install -r requirements.txt
 
-# 2. Build the React frontend
+echo "Building React frontend..."
 cd frontend
 npm install
 npm run build
-cd ..
