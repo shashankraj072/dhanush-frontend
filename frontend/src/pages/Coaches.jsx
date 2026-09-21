@@ -72,25 +72,35 @@ export default function Coaches() {
         <p>Book a live 1-on-1 video consultation with our expert personal trainers.</p>
       </div>
 
-      <div className="coaches-grid">
-        {COACHES.map(coach => (
-          <div key={coach.id} className="coach-card glass">
-            <div className="coach-avatar">
-              <img src="/coach.jpg" alt="Coach Dhanush" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-            <div className="coach-info">
-              <h3>{coach.name}</h3>
-              <span className="specialty">{coach.specialty}</span>
-              <p>{coach.bio}</p>
-            </div>
-            <button 
-              className="start-call-btn"
-              onClick={() => setActiveCall({ id: coach.id })}
-            >
-              Start Video Call
-            </button>
+      <div className="single-coach-profile">
+        <div className="coach-images-row">
+          <img src="/coach.jpg" alt="Coach Dhanush" className="coach-main-photo" />
+          <img src="/certificate.png" alt="Certificate" className="coach-certificate-img" />
+        </div>
+
+        <div className="coach-bio-section">
+          <h3>Coach Dhanush H V</h3>
+          <p>
+            Dhanush is a certified fitness expert with years of experience helping clients achieve their weight loss, muscle gain, and endurance goals. 
+            He holds a prestigious certification from the Karnataka Fitness Academy and specializes in creating tailored, science-backed workout routines.
+          </p>
+        </div>
+
+        <div className="coach-card glass" style={{ maxWidth: '400px', margin: '0 auto', marginTop: '30px' }}>
+          <div className="coach-avatar">
+            <img src="/coach.jpg" alt="Coach Dhanush" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-        ))}
+          <div className="coach-info">
+            <h3>Coach Dhanush</h3>
+            <span className="specialty">💪 Strength, 🏃 Cardio, 🧘 Yoga</span>
+          </div>
+          <button 
+            className="start-call-btn"
+            onClick={() => setActiveCall({ id: 'c1' })}
+          >
+            Start Video Call
+          </button>
+        </div>
       </div>
     </div>
   )
