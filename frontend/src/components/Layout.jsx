@@ -22,7 +22,7 @@ export default function Layout({ children }) {
     <div className="appShell">
       <header className="topBar">
         <Link to="/" className="brand">
-          AdaptFit MVP
+          AdaptFit
         </Link>
         <nav className="nav">
           <NavLink to="/plan">
