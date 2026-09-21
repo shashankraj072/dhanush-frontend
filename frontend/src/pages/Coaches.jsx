@@ -26,7 +26,8 @@ export default function Coaches() {
           parentNode: jitsiContainerRef.current,
           configOverwrite: { 
             startWithAudioMuted: false, 
-            startWithVideoMuted: false 
+            startWithVideoMuted: false,
+            p2p: { enabled: false }
           }
         }
         const api = new window.JitsiMeetExternalAPI(domain, options)
@@ -48,7 +49,7 @@ export default function Coaches() {
 
   if (activeCall?.id) {
     const coach = COACHES.find(c => c.id === activeCall.id)
-    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${activeCall.roomName}#config.startWithVideoMuted=false&config.startWithAudioMuted=false`)
+    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${activeCall.roomName}#config.startWithVideoMuted=false&config.startWithAudioMuted=false&config.p2p.enabled=false`)
     return (
       <div className="coaches-page fade-in">
         <div className="coaches-header">
