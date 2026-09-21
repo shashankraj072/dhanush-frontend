@@ -38,57 +38,86 @@
   color: white;
 }
 
-.coaches-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.coach-card {
+.trainer-profile {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 30px 20px;
-  border-radius: 16px;
-  text-align: center;
-  transition: transform 0.2s;
+  gap: 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 30px;
+  margin-top: 10px;
 }
 
-.coach-card:hover {
-  transform: translateY(-5px);
+@media (min-width: 768px) {
+  .trainer-profile {
+    flex-direction: row;
+    align-items: flex-start;
+  }
 }
 
-.coach-avatar {
-  font-size: 4rem;
-  background: rgba(var(--primary-rgb), 0.1);
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+.trainer-photo-container {
+  flex: 0 0 300px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  overflow: hidden;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.coach-info h3 {
-  margin: 0 0 4px 0;
-  font-size: 1.4rem;
+.trainer-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.trainer-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trainer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.trainer-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 2rem;
+  color: var(--text);
 }
 
 .specialty {
   display: inline-block;
   color: var(--primary);
   font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 12px;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
 }
 
-.coach-info p {
+.trainer-bio {
   color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0 0 24px 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0 0 30px 0;
+}
+
+.trainer-certificate {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.trainer-certificate img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .start-call-btn {
