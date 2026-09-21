@@ -46,7 +46,8 @@ export default function AIChatbot() {
       } else {
         setMessages(prev => [...prev, { role: 'model', content: data.error || 'Something went wrong.' }])
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error)
       setMessages(prev => [...prev, { role: 'model', content: 'Failed to connect to the trainer.' }])
     } finally {
       setIsLoading(false)
