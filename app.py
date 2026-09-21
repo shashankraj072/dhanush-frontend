@@ -384,11 +384,19 @@ def chat():
         
     try:
         model = genai.GenerativeModel('gemini-1.5-flash-latest', system_instruction=system_prompt)
-        # Format history for Gemini
+        # Format history for Gemini strictly alternating and starting with user
         history = []
+        last_role = None
         for msg in messages[:-1]:  # Exclude the last message which is the current prompt
             role = "user" if msg['role'] == "user" else "model"
-            history.append({"role": role, "parts": [msg['content']]})
+            if role == "model" and not history:
+                continue # Skip leading model messages
+            if role == last_role:
+                # Merge consecutive messages from the same role
+                history[-1]["parts"][0] += "\n\n" + msg['content']
+            else:
+                history.append({"role": role, "parts": [msg['content']]})
+                last_role = role
             
         chat_session = model.start_chat(history=history)
         response = chat_session.send_message(messages[-1]['content'])
