@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import './Coaches.css'
 
 const COACHES = [
@@ -9,68 +9,57 @@ const COACHES = [
 
 export default function Coaches() {
   const [activeCall, setActiveCall] = useState(null)
-  const jitsiContainerRef = useRef(null)
-
-  useEffect(() => {
-    if (activeCall?.roomName && jitsiContainerRef.current) {
-      // Load Jitsi Meet External API script dynamically
-      const script = document.createElement('script')
-      script.src = "https://meet.jit.si/external_api.js"
-      script.async = true
-      script.onload = () => {
-        const domain = "meet.jit.si"
-        const options = {
-          roomName: activeCall.roomName,
-          width: '100%',
-          height: '100%',
-          parentNode: jitsiContainerRef.current,
-          configOverwrite: { 
-            startWithAudioMuted: false, 
-            startWithVideoMuted: false,
-            p2p: { enabled: false }
-          }
-        }
-        const api = new window.JitsiMeetExternalAPI(domain, options)
-        
-        api.addEventListener('videoConferenceLeft', () => {
-          setActiveCall(null)
-        })
-      }
-      document.body.appendChild(script)
-
-      return () => {
-        jitsiContainerRef.current.innerHTML = ''
-        if (document.body.contains(script)) {
-          document.body.removeChild(script)
-        }
-      }
-    }
-  }, [activeCall])
 
   if (activeCall?.id) {
     const coach = COACHES.find(c => c.id === activeCall.id)
-    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${activeCall.roomName}#config.startWithVideoMuted=false&config.startWithAudioMuted=false&config.p2p.enabled=false`)
+    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: [PASTE YOUR GOOGLE MEET LINK HERE]`)
+    
     return (
       <div className="coaches-page fade-in">
         <div className="coaches-header">
           <h2>Live Session with {coach.name}</h2>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
-            <button className="back-btn" style={{ margin: 0 }} onClick={() => setActiveCall(null)}>
-              End Call & Go Back
-            </button>
-            <a 
-              className="start-call-btn" 
-              style={{ margin: 0, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', width: 'auto' }}
-              href={`https://wa.me/${coach.phone}?text=${waText}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              📱 Message Coach Link
-            </a>
-          </div>
+          <button className="back-btn" onClick={() => setActiveCall(null)}>
+            Go Back
+          </button>
         </div>
-        <div className="video-call-container glass" ref={jitsiContainerRef} style={{ marginTop: '16px' }}>
-          {/* Jitsi iframe will be injected here */}
+        
+        <div className="video-call-container glass" style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', textAlign: 'center' }}>
+          <h3 style={{ fontSize: '1.8rem', margin: 0 }}>Google Meet Connection</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '500px' }}>
+            To ensure the highest quality connection that bypasses all network blocks, we use Google Meet for coaching sessions.
+          </p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '600px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+              <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary)' }}>Step 1</span>
+              <a 
+                href="https://meet.google.com/new" 
+                target="_blank" 
+                rel="noreferrer"
+                className="start-call-btn"
+                style={{ textDecoration: 'none', display: 'inline-block' }}
+              >
+                📹 Create Google Meet Room
+              </a>
+              <span style={{ color: 'var(--text-muted)' }}>(Copy the meeting link it gives you!)</span>
+            </div>
+            
+            <div style={{ width: '100%', height: '1px', background: 'var(--border)' }}></div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+              <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#25D366' }}>Step 2</span>
+              <a 
+                href={`https://wa.me/${coach.phone}?text=${waText}`} 
+                target="_blank" 
+                rel="noreferrer"
+                className="start-call-btn"
+                style={{ textDecoration: 'none', display: 'inline-block', background: '#25D366' }}
+              >
+                📱 Message Link to Coach Dhanush
+              </a>
+              <span style={{ color: 'var(--text-muted)' }}>(Paste the Google Meet link in the WhatsApp chat)</span>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -96,10 +85,7 @@ export default function Coaches() {
             </div>
             <button 
               className="start-call-btn"
-              onClick={() => {
-                const roomName = `AdaptFit-Consultation-${coach.id}-${Date.now()}`
-                setActiveCall({ id: coach.id, roomName })
-              }}
+              onClick={() => setActiveCall({ id: coach.id })}
             >
               Start Video Call
             </button>
