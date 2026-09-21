@@ -2,9 +2,9 @@ import { useState, useRef, useEffect } from 'react'
 import './Coaches.css'
 
 const COACHES = [
-  { id: 'c1', name: 'Coach Sarah', specialty: 'Yoga & Flexibility', bio: 'Certified yoga instructor with 5 years experience.' },
-  { id: 'c2', name: 'Coach Mike', specialty: 'Strength Training', bio: 'Specializes in hypertrophy and powerlifting.' },
-  { id: 'c3', name: 'Coach David', specialty: 'Cardio & Endurance', bio: 'Marathon runner and endurance expert.' }
+  { id: 'c1', name: 'Coach Dhanush', specialty: 'Yoga & Flexibility', bio: 'Certified yoga instructor with 5 years experience.', phone: '918147007570' },
+  { id: 'c2', name: 'Coach Dhanush', specialty: 'Strength Training', bio: 'Specializes in hypertrophy and powerlifting.', phone: '918147007570' },
+  { id: 'c3', name: 'Coach Dhanush', specialty: 'Cardio & Endurance', bio: 'Marathon runner and endurance expert.', phone: '918147007570' }
 ]
 
 export default function Coaches() {
@@ -12,7 +12,7 @@ export default function Coaches() {
   const jitsiContainerRef = useRef(null)
 
   useEffect(() => {
-    if (activeCall && jitsiContainerRef.current) {
+    if (activeCall?.roomName && jitsiContainerRef.current) {
       // Load Jitsi Meet External API script dynamically
       const script = document.createElement('script')
       script.src = "https://meet.jit.si/external_api.js"
@@ -20,7 +20,7 @@ export default function Coaches() {
       script.onload = () => {
         const domain = "meet.jit.si"
         const options = {
-          roomName: `AdaptFit-Consultation-${activeCall}-${Date.now()}`,
+          roomName: activeCall.roomName,
           width: '100%',
           height: '100%',
           parentNode: jitsiContainerRef.current,
@@ -46,8 +46,8 @@ export default function Coaches() {
     }
   }, [activeCall])
 
-  if (activeCall) {
-    const coach = COACHES.find(c => c.id === activeCall)
+  if (activeCall?.id) {
+    const coach = COACHES.find(c => c.id === activeCall.id)
     return (
       <div className="coaches-page fade-in">
         <div className="coaches-header">
@@ -83,7 +83,12 @@ export default function Coaches() {
             </div>
             <button 
               className="start-call-btn"
-              onClick={() => setActiveCall(coach.id)}
+              onClick={() => {
+                const roomName = `AdaptFit-Consultation-${coach.id}-${Date.now()}`
+                const text = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${roomName}`)
+                window.open(`https://wa.me/${coach.phone}?text=${text}`, '_blank')
+                setActiveCall({ id: coach.id, roomName })
+              }}
             >
               Start Video Call
             </button>

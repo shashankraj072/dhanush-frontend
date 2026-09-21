@@ -113,7 +113,7 @@
 
 .video-call-container {
   flex: 1;
-  min-height: 500px;
+  min-height: calc(100vh - 200px);
   border-radius: 16px;
   overflow: hidden;
   position: relative;
