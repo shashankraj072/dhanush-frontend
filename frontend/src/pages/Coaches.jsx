@@ -48,7 +48,7 @@ export default function Coaches() {
 
   if (activeCall?.id) {
     const coach = COACHES.find(c => c.id === activeCall.id)
-    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${activeCall.roomName}`)
+    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${activeCall.roomName}#config.startWithVideoMuted=false&config.startWithAudioMuted=false`)
     return (
       <div className="coaches-page fade-in">
         <div className="coaches-header">
