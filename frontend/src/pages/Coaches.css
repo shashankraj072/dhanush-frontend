@@ -38,104 +38,57 @@
   color: white;
 }
 
-.trainer-profile {
+.coaches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.coach-card {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 30px;
-  margin-top: 10px;
-}
-
-@media (min-width: 768px) {
-  .trainer-profile {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-}
-
-.trainer-photo-container {
-  flex: 0 0 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.trainer-photo {
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  align-items: center;
+  padding: 30px 20px;
   border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.trainer-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.trainer-tags {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.training-tag {
-  background: rgba(var(--primary-rgb), 0.1);
-  color: var(--primary);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
   text-align: center;
-  border: 1px solid rgba(var(--primary-rgb), 0.3);
+  transition: transform 0.2s;
 }
 
-.trainer-info {
-  flex: 1;
+.coach-card:hover {
+  transform: translateY(-5px);
+}
+
+.coach-avatar {
+  font-size: 4rem;
+  background: rgba(var(--primary-rgb), 0.1);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  overflow: hidden;
 }
 
-.trainer-info h3 {
-  margin: 0 0 5px 0;
-  font-size: 2rem;
-  color: var(--text);
+.coach-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.4rem;
 }
 
 .specialty {
   display: inline-block;
   color: var(--primary);
   font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
 }
 
-.trainer-bio {
+.coach-info p {
   color: var(--text-muted);
-  font-size: 1.05rem;
-  line-height: 1.6;
-  margin: 0 0 30px 0;
-}
-
-.trainer-certificate {
-  width: 100%;
-  max-width: 500px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  margin-bottom: 30px;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-.trainer-certificate img {
-  width: 100%;
-  height: auto;
-  display: block;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
 }
 
 .start-call-btn {

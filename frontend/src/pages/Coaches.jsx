@@ -72,36 +72,25 @@ export default function Coaches() {
         <p>Book a live 1-on-1 video consultation with our expert personal trainers.</p>
       </div>
 
-      <div className="trainer-profile">
-        <div className="trainer-photo-container">
-          <div className="trainer-photo">
-            <img src="/coach.jpg" alt="Coach Dhanush" />
+      <div className="coaches-grid">
+        {COACHES.map(coach => (
+          <div key={coach.id} className="coach-card glass">
+            <div className="coach-avatar">
+              <img src="/coach.jpg" alt="Coach Dhanush" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <div className="coach-info">
+              <h3>{coach.name}</h3>
+              <span className="specialty">{coach.specialty}</span>
+              <p>{coach.bio}</p>
+            </div>
+            <button 
+              className="start-call-btn"
+              onClick={() => setActiveCall({ id: coach.id })}
+            >
+              Start Video Call
+            </button>
           </div>
-          <div className="trainer-tags">
-            <span className="training-tag">💪 Strength Training</span>
-            <span className="training-tag">🏃 Cardio & Endurance</span>
-            <span className="training-tag">🧘 Yoga & Flexibility</span>
-          </div>
-          <button 
-            className="start-call-btn"
-            onClick={() => setActiveCall({ id: 'c1' })}
-          >
-            Start Video Call
-          </button>
-        </div>
-
-        <div className="trainer-info">
-          <h3>Coach Dhanush H V</h3>
-          <span className="specialty">Certified Fitness Trainer</span>
-          <p className="trainer-bio">
-            Dhanush is a certified fitness expert with years of experience helping clients achieve their weight loss, muscle gain, and endurance goals. 
-            He holds a prestigious certification from the Karnataka Fitness Academy and specializes in creating tailored, science-backed workout routines.
-          </p>
-          
-          <div className="trainer-certificate">
-            <img src="/certificate.png" alt="Karnataka Fitness Academy Certificate" />
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   )
