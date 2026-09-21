@@ -76,7 +76,7 @@ export default function Coaches() {
         {COACHES.map(coach => (
           <div key={coach.id} className="coach-card glass">
             <div className="coach-avatar">
-              🧑‍🏫
+              <img src="/coach.jpg" alt="Coach Dhanush" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div className="coach-info">
               <h3>{coach.name}</h3>
