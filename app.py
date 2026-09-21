@@ -405,7 +405,16 @@ def chat():
                 last_role = role
             
         chat_session = model.start_chat(history=history)
-        response = chat_session.send_message(messages[-1]['content'])
+        
+        # Limit max output tokens to ensure a faster response
+        generation_config = genai.types.GenerationConfig(
+            max_output_tokens=150,
+            temperature=0.7
+        )
+        response = chat_session.send_message(
+            messages[-1]['content'],
+            generation_config=generation_config
+        )
         
         return jsonify({
             "ok": True,
