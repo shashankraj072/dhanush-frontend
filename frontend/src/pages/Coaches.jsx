@@ -48,15 +48,27 @@ export default function Coaches() {
 
   if (activeCall?.id) {
     const coach = COACHES.find(c => c.id === activeCall.id)
+    const waText = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${activeCall.roomName}`)
     return (
       <div className="coaches-page fade-in">
         <div className="coaches-header">
           <h2>Live Session with {coach.name}</h2>
-          <button className="back-btn" onClick={() => setActiveCall(null)}>
-            End Call & Go Back
-          </button>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+            <button className="back-btn" style={{ margin: 0 }} onClick={() => setActiveCall(null)}>
+              End Call & Go Back
+            </button>
+            <a 
+              className="start-call-btn" 
+              style={{ margin: 0, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', width: 'auto' }}
+              href={`https://wa.me/${coach.phone}?text=${waText}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              📱 Message Coach Link
+            </a>
+          </div>
         </div>
-        <div className="video-call-container glass" ref={jitsiContainerRef}>
+        <div className="video-call-container glass" ref={jitsiContainerRef} style={{ marginTop: '16px' }}>
           {/* Jitsi iframe will be injected here */}
         </div>
       </div>
@@ -85,8 +97,6 @@ export default function Coaches() {
               className="start-call-btn"
               onClick={() => {
                 const roomName = `AdaptFit-Consultation-${coach.id}-${Date.now()}`
-                const text = encodeURIComponent(`Hi Coach! I'm ready for my consultation. Please join my video room here: https://meet.jit.si/${roomName}`)
-                window.open(`https://wa.me/${coach.phone}?text=${text}`, '_blank')
                 setActiveCall({ id: coach.id, roomName })
               }}
             >
