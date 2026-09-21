@@ -383,7 +383,7 @@ def chat():
         })
         
     try:
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-3.6-flash')
         # Format history for Gemini strictly alternating and starting with user
         history = []
         last_role = None
