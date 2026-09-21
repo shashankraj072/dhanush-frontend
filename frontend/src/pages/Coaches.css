@@ -77,6 +77,24 @@
   object-fit: cover;
 }
 
+.trainer-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.training-tag {
+  background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid rgba(var(--primary-rgb), 0.3);
+}
+
 .trainer-info {
   flex: 1;
   display: flex;

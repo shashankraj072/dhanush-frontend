@@ -77,6 +77,11 @@ export default function Coaches() {
           <div className="trainer-photo">
             <img src="/coach.jpg" alt="Coach Dhanush" />
           </div>
+          <div className="trainer-tags">
+            <span className="training-tag">💪 Strength Training</span>
+            <span className="training-tag">🏃 Cardio & Endurance</span>
+            <span className="training-tag">🧘 Yoga & Flexibility</span>
+          </div>
           <button 
             className="start-call-btn"
             onClick={() => setActiveCall({ id: 'c1' })}
