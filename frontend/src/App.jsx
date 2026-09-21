@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Plan from './pages/Plan'
 import Profile from './pages/Profile'
 import Workout from './pages/Workout'
+import Trainer from './pages/Trainer'
 import { loadUser } from './state'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/plan" element={<Plan />} />
         <Route path="/workout" element={<Workout />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/trainer" element={<Trainer />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { loadUser } from '../state'
-import './AIChatbot.css'
+import './Trainer.css'
 
-export default function AIChatbot() {
-  const [isOpen, setIsOpen] = useState(false)
+export default function Trainer() {
   const [messages, setMessages] = useState([
     { role: 'model', content: 'Hi! I am your AdaptFit Personal Trainer. How can I help you today?' }
   ])
@@ -18,7 +17,7 @@ export default function AIChatbot() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages, isOpen])
+  }, [messages])
 
   const handleSend = async (e) => {
     e.preventDefault()
@@ -55,49 +54,41 @@ export default function AIChatbot() {
   }
 
   return (
-    <div className={`chatbot-container ${isOpen ? 'open' : 'closed'}`}>
-      {!isOpen && (
-        <button className="chatbot-toggle" onClick={() => setIsOpen(true)}>
-          💬
-        </button>
-      )}
+    <div className="trainer-page fade-in">
+      <div className="trainer-header">
+        <h2>AI Personal Trainer</h2>
+        <p>Ask anything about your fitness journey, diet, or workouts.</p>
+      </div>
       
-      {isOpen && (
-        <div className="chatbot-window glass">
-          <div className="chatbot-header">
-            <h3>AI Personal Trainer</h3>
-            <button className="chatbot-close ghostBtn" onClick={() => setIsOpen(false)}>✕</button>
-          </div>
-          
-          <div className="chatbot-messages">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`chat-bubble ${msg.role}`}>
-                {msg.content}
-              </div>
-            ))}
-            {isLoading && (
-              <div className="chat-bubble model loading">
-                <span className="dot"></span>
-                <span className="dot"></span>
-                <span className="dot"></span>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-          
-          <form className="chatbot-input" onSubmit={handleSend}>
-            <input 
-              type="text" 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask for advice..."
-            />
-            <button type="submit" disabled={isLoading || !input.trim()}>
-              Send
-            </button>
-          </form>
+      <div className="trainer-chat glass">
+        <div className="trainer-messages">
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`chat-bubble ${msg.role}`}>
+              {msg.content}
+            </div>
+          ))}
+          {isLoading && (
+            <div className="chat-bubble model loading">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      )}
+        
+        <form className="trainer-input" onSubmit={handleSend}>
+          <input 
+            type="text" 
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask for advice..."
+          />
+          <button type="submit" disabled={isLoading || !input.trim()}>
+            Send
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
