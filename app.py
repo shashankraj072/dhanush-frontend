@@ -409,7 +409,7 @@ def chat():
         print(f"Chatbot error: {e}")
         return jsonify({
             "ok": False,
-            "error": "I'm having trouble connecting to my brain right now. Please try again later!"
+            "error": f"I'm having trouble connecting to my brain right now. Error: {str(e)}"
         }), 500
 
 
