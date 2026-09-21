@@ -47,7 +47,7 @@ export default function Trainer() {
       }
     } catch (error) {
       console.error(error)
-      setMessages(prev => [...prev, { role: 'model', content: 'Failed to connect to the trainer.' }])
+      setMessages(prev => [...prev, { role: 'model', content: `Failed to connect: ${error.message}` }])
     } finally {
       setIsLoading(false)
     }
