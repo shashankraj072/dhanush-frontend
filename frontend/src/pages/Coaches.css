@@ -1,0 +1,124 @@
+.coaches-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.coaches-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.coaches-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.8rem;
+}
+
+.coaches-header p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.coaches-header .back-btn {
+  align-self: flex-start;
+  margin-top: 10px;
+  background: rgba(var(--primary-rgb), 0.2);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.coaches-header .back-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.coaches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.coach-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  border-radius: 16px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.coach-card:hover {
+  transform: translateY(-5px);
+}
+
+.coach-avatar {
+  font-size: 4rem;
+  background: rgba(var(--primary-rgb), 0.1);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.coach-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.4rem;
+}
+
+.specialty {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.coach-info p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+}
+
+.start-call-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: auto;
+}
+
+.start-call-btn:hover {
+  opacity: 0.9;
+}
+
+.start-call-btn:active {
+  transform: scale(0.95);
+}
+
+.video-call-container {
+  flex: 1;
+  min-height: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-call-container iframe {
+  border: none;
+}

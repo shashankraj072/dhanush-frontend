@@ -41,6 +41,10 @@ export default function Layout({ children }) {
             <span className="navIcon">🤖</span>
             <span>Trainer</span>
           </NavLink>
+          <NavLink to="/coaches">
+            <span className="navIcon">🧑‍🏫</span>
+            <span>Coaches</span>
+          </NavLink>
           <NavLink to="/profile">
             <span className="navIcon">👤</span>
             <span>Profile</span>
