@@ -42,7 +42,7 @@ export default function Layout({ children }) {
             <span>Chat</span>
           </NavLink>
           <NavLink to="/coaches">
-            <span className="navIcon">🧑‍🏫</span>
+            <span className="navIcon">💪</span>
             <span>Personal Trainer</span>
           </NavLink>
           <NavLink to="/profile">
