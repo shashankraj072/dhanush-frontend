@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { clearUser, loadUser } from '../state'
+import AIChatbot from './AIChatbot'
 
 export default function Layout({ children }) {
   const nav = useNavigate()
@@ -67,6 +68,7 @@ export default function Layout({ children }) {
       <footer className="footer">
         MVP: workouts + meals + webcam posture (4 exercises)
       </footer>
+      <AIChatbot />
     </div>
   )
 }

@@ -6,6 +6,16 @@ from flask_cors import CORS
 import uuid
 import random
 
+try:
+    import google.generativeai as genai
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+    else:
+        genai = None
+except ImportError:
+    genai = None
+
 # Load ML Models
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'ml_models')
 rf_model, le_goal, le_level = None, None, None
@@ -346,6 +356,53 @@ def get_progress(user_id):
         "stats": progress,
         "logs": sorted(user_workouts, key=lambda x: x.get('createdAtMs', 0), reverse=True)[:50]
     })
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.json
+    messages = data.get('messages', [])
+    user_id = data.get('userId')
+    
+    profile = profiles.get(user_id, {})
+    goal = profile.get("goal", "general fitness")
+    weight = profile.get("weight", "unknown")
+    level = profile.get("fitness_level", "beginner")
+    
+    system_prompt = (
+        f"You are the AdaptFit AI Personal Trainer. Your goal is to help the user achieve their fitness goals. "
+        f"The user's goal is {goal}, they weight {weight}kg, and they are a {level}. "
+        f"Keep your answers concise, motivating, and strictly related to fitness, health, and diet. "
+        f"Use a friendly and encouraging tone."
+    )
+    
+    if not genai:
+        # Fallback simulated response
+        return jsonify({
+            "ok": True,
+            "reply": "Hi there! I am the AdaptFit AI Trainer. (Note: Gemini API is not configured. Set GEMINI_API_KEY in backend environment to use the real AI). How can I help you with your fitness journey today?"
+        })
+        
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash-latest', system_instruction=system_prompt)
+        # Format history for Gemini
+        history = []
+        for msg in messages[:-1]:  # Exclude the last message which is the current prompt
+            role = "user" if msg['role'] == "user" else "model"
+            history.append({"role": role, "parts": [msg['content']]})
+            
+        chat_session = model.start_chat(history=history)
+        response = chat_session.send_message(messages[-1]['content'])
+        
+        return jsonify({
+            "ok": True,
+            "reply": response.text
+        })
+    except Exception as e:
+        print(f"Chatbot error: {e}")
+        return jsonify({
+            "ok": False,
+            "error": "I'm having trouble connecting to my brain right now. Please try again later!"
+        }), 500
 
 
 
