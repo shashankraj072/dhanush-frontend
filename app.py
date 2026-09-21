@@ -413,9 +413,20 @@ def chat():
         })
     except Exception as e:
         print(f"Chatbot error: {e}")
+        try:
+            import requests
+            import os
+            api_key = os.environ.get("GEMINI_API_KEY")
+            res = requests.get(f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}")
+            data = res.json()
+            available = [m['name'] for m in data.get('models', []) if 'generateContent' in m.get('supportedGenerationMethods', [])]
+            models_str = ", ".join(available[:10]) if available else str(data)
+        except Exception as inner_e:
+            models_str = "Could not fetch models: " + str(inner_e)
+            
         return jsonify({
             "ok": False,
-            "error": f"I'm having trouble connecting to my brain right now. Error: {str(e)}"
+            "error": f"Error: {str(e)}. Available models: {models_str}"
         }), 500
 
 
