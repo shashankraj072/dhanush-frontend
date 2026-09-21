@@ -371,7 +371,7 @@ def chat():
     system_prompt = (
         f"You are the AdaptFit AI Personal Trainer. Your goal is to help the user achieve their fitness goals. "
         f"The user's goal is {goal}, they weight {weight}kg, and they are a {level}. "
-        f"Keep your answers concise, motivating, and strictly related to fitness, health, and diet. "
+        f"Keep your answers VERY concise (1-2 sentences maximum), motivating, and strictly related to fitness, health, and diet. "
         f"Use a friendly and encouraging tone."
     )
     
@@ -406,15 +406,7 @@ def chat():
             
         chat_session = model.start_chat(history=history)
         
-        # Limit max output tokens to ensure a faster response
-        generation_config = genai.types.GenerationConfig(
-            max_output_tokens=150,
-            temperature=0.7
-        )
-        response = chat_session.send_message(
-            messages[-1]['content'],
-            generation_config=generation_config
-        )
+        response = chat_session.send_message(messages[-1]['content'])
         
         return jsonify({
             "ok": True,
