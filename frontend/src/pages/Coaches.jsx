@@ -91,7 +91,7 @@ export default function Coaches() {
           </div>
           <div className="coach-info">
             <h3>Coach Dhanush</h3>
-            <span className="specialty">💪 Strength, 🏋️ Muscle Gain, 🔥 Fat Loss, 🏃 Cardio, 🧘 Yoga</span>
+            <span className="specialty">💪&nbsp;Strength, 🏋️&nbsp;Muscle&nbsp;Gain, 🔥&nbsp;Fat&nbsp;Loss, 🏃&nbsp;Cardio, 🧘&nbsp;Yoga</span>
           </div>
           <button 
             className="start-call-btn"
