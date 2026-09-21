@@ -68,7 +68,7 @@ export default function Coaches() {
   return (
     <div className="coaches-page fade-in">
       <div className="coaches-header">
-        <h2>Human Coaches</h2>
+        <h2>Personal Trainer</h2>
         <p>Book a live 1-on-1 video consultation with our expert personal trainers.</p>
       </div>
 

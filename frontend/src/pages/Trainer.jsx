@@ -56,7 +56,7 @@ export default function Trainer() {
   return (
     <div className="trainer-page fade-in">
       <div className="trainer-header">
-        <h2>AI Personal Trainer</h2>
+        <h2>AI Chat</h2>
         <p>Ask anything about your fitness journey, diet, or workouts.</p>
       </div>
       
